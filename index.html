@@ -227,8 +227,92 @@
     <div class="bg-overlay"></div>
     <div id="bg-decoration"></div>
 
+<div id="store-modal" class="modal-overlay z-[200]">
+    <div class="glass-panel p-6 w-full max-w-md text-center transform scale-95 transition-transform duration-300 relative overflow-hidden">
+        
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500"></div>
+        <button onclick="document.getElementById('store-modal').classList.remove('active')" class="absolute top-4 right-4 text-white/50 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+
+        <h2 class="text-3xl font-black fancy-font text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-amber-500 mb-2">UNLOCK PLEASURE 🔒</h2>
+        <p class="text-xs opacity-60 mb-6">Choose your access pass. Secure & Instant.</p>
+
+        <div id="active-pass-banner" class="hidden bg-green-900/40 border border-green-500/50 p-4 rounded-xl mb-4 animate-pulse">
+            <p class="text-[10px] uppercase text-green-400 font-bold tracking-widest">ACTIVE PASS CODE</p>
+            <h2 id="display-active-code" class="text-2xl font-mono text-white font-bold my-1">...</h2>
+            <p id="display-expiry" class="text-xs text-white/60">...</p>
+        </div>
+
+        <div class="space-y-3 max-h-[60vh] overflow-y-auto custom-scroll pr-1">
+            
+            <div id="trial-card" class="p-4 rounded-xl border border-blue-500/30 bg-blue-500/10 text-left relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-blue-500 text-white text-[9px] font-bold px-2 py-1 rounded-bl-lg">FREE</div>
+                <h3 class="text-lg font-bold text-blue-300">10 Min Trial ⏱️</h3>
+                <p class="text-xs opacity-70 mb-3">Test all Premium Games (Monopoly, Risk, etc). Max 2 uses.</p>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-mono text-blue-200" id="trial-status">Uses Left: 2/2</span>
+                    <button onclick="window.activateTrial()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-bold transition-all">START TRIAL</button>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-pink-500/30 bg-pink-500/10 text-left relative hover:border-pink-400 transition-colors">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-lg font-bold text-pink-300">Date Night Pass 🌙</h3>
+                    <span class="text-xl font-black text-white">₹49</span>
+                </div>
+                <p class="text-xs opacity-70 mb-3">Full Access for 24 Hours. Perfect for tonight.</p>
+                <button onclick="window.openPayment('DAY')" class="w-full py-3 bg-gradient-to-r from-pink-600 to-rose-600 rounded-lg text-sm font-bold shadow-lg hover:scale-[1.02] transition-transform">UNLOCK NOW</button>
+            </div>
+
+            <div class="p-4 rounded-xl border border-purple-500/30 bg-purple-500/10 text-left relative hover:border-purple-400 transition-colors">
+                <div class="absolute top-0 right-0 bg-yellow-500 text-black text-[9px] font-bold px-2 py-1 rounded-bl-lg z-10">POPULAR</div>
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-lg font-bold text-purple-300">Week of Passion 🔥</h3>
+                    <span class="text-xl font-black text-white">₹99</span>
+                </div>
+                <p class="text-xs opacity-70 mb-3">Full Access for 7 Days. Try every game.</p>
+                <button onclick="window.openPayment('WEEK')" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg text-sm font-bold shadow-lg hover:scale-[1.02] transition-transform">UNLOCK NOW</button>
+            </div>
+
+            <div class="p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-left relative hover:border-amber-400 transition-colors">
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-lg font-bold text-amber-300">Monthly Desire 👑</h3>
+                    <span class="text-xl font-black text-white">₹199</span>
+                </div>
+                <p class="text-xs opacity-70 mb-3">30 Days Access. Includes Moon Cycle Mode.</p>
+                <button onclick="window.openPayment('MNTH')" class="w-full py-3 bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg text-sm font-bold shadow-lg hover:scale-[1.02] transition-transform">UNLOCK NOW</button>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-white/10">
+                <p class="text-[10px] opacity-50 mb-2">Have a code? Enter manually:</p>
+                <div class="flex gap-2">
+                    <input type="text" id="manual-code-input" placeholder="PASTE CODE" class="flex-1 bg-black/50 border border-white/20 rounded-lg px-3 py-2 text-center font-mono text-sm uppercase">
+                    <button onclick="window.verifyManualCode()" class="bg-white/10 hover:bg-white/20 px-4 rounded-lg font-bold text-xs">VERIFY</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
     <!-- CUSTOM FEEDBACK ELEMENT -->
     <div id="feedback-container" class="fixed top-0 left-1/2 transform -translate-x-1/2 z-[101] w-full max-w-sm"></div>
+
+<div id="starter-modal" class="modal-overlay">
+    <div class="glass-panel p-6 w-full max-w-sm text-center transform scale-95 transition-transform duration-300">
+        <h3 class="text-2xl font-bold fancy-font mb-4 text-white">Who Starts First? 👑</h3>
+        <p class="text-xs opacity-60 mb-6">As the Host, you decide the flow.</p>
+        
+        <div class="flex gap-4 mb-4">
+            <button onclick="window.confirmGameStart('Him')" class="flex-1 py-4 rounded-xl font-bold text-lg bg-blue-600/30 border border-blue-500 hover:bg-blue-600/50 text-blue-200 transition-all">
+                HIM ♂️
+            </button>
+            <button onclick="window.confirmGameStart('Her')" class="flex-1 py-4 rounded-xl font-bold text-lg bg-pink-600/30 border border-pink-500 hover:bg-pink-600/50 text-pink-200 transition-all">
+                HER ♀️
+            </button>
+        </div>
+        <button onclick="document.getElementById('starter-modal').classList.remove('active')" class="text-xs opacity-50 hover:text-white underline">Cancel</button>
+    </div>
+</div>
 
     <!-- API KEY MODAL (Mobile-optimized width: max-w-sm) -->
     <div id="api-key-modal" class="modal-overlay">
@@ -342,16 +426,21 @@
     </div>
     
     <header id="main-header" class="w-full max-w-5xl flex justify-between items-center py-4 z-50 fixed top-0 px-4 backdrop-blur-sm bg-black/20 transition-all duration-300 opacity-0 pointer-events-none">
-        <div class="flex items-center gap-2 cursor-pointer hover:opacity-80" onclick="window.showScreen('home')">
-            <div class="p-2 bg-white/10 rounded-lg"><i data-lucide="layout-grid" class="w-5 h-5 text-white"></i></div>
-            <span class="font-bold tracking-wider hidden md:block">HOME</span>
-        </div>
-        <div class="flex gap-3">
-            <button onclick="window.toggleMusicPanel()" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors relative"><i data-lucide="music" class="w-5 h-5 text-white"></i><span id="music-indicator" class="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full hidden"></span></button>
-            <button onclick="window.openMultiplayerModal()" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors relative" id="mp-status-btn" title="Multiplayer Status"><i data-lucide="users" class="w-5 h-5 text-white" id="mp-status-icon"></i><span id="mp-connected-dot" class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-black"></span></button>
-            <button onclick="window.showScreen('setup')" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors"><i data-lucide="settings" class="w-5 h-5 text-white"></i></button>
-        </div>
-    </header>
+    <div class="flex items-center gap-2 cursor-pointer hover:opacity-80" onclick="window.showScreen('home')">
+        <div class="p-2 bg-white/10 rounded-lg"><i data-lucide="layout-grid" class="w-5 h-5 text-white"></i></div>
+        <span class="font-bold tracking-wider hidden md:block">HOME</span>
+    </div>
+    <div class="flex gap-3">
+        <button onclick="window.openStore()" class="bg-amber-500/20 hover:bg-amber-500/40 border border-amber-500/50 p-2 rounded-full transition-colors relative group">
+            <i data-lucide="crown" class="w-5 h-5 text-amber-400 fill-amber-400/20"></i>
+            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] bg-black text-amber-400 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">VIP Store</span>
+        </button>
+
+        <button onclick="window.toggleMusicPanel()" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors relative"><i data-lucide="music" class="w-5 h-5 text-white"></i><span id="music-indicator" class="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full hidden"></span></button>
+        <button onclick="window.openMultiplayerModal()" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors relative" id="mp-status-btn" title="Multiplayer Status"><i data-lucide="users" class="w-5 h-5 text-white" id="mp-status-icon"></i><span id="mp-connected-dot" class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-black"></span></button>
+        <button onclick="window.showScreen('setup')" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors"><i data-lucide="settings" class="w-5 h-5 text-white"></i></button>
+    </div>
+</header>
 
     <div id="music-panel" class="glass-panel p-4">
         <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
@@ -411,6 +500,21 @@
         <div class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20"><i data-lucide="zap" class="w-7 h-7 text-blue-400"></i></div>
         <div><h3 class="text-lg font-bold mb-1">Truth/Dare</h3><p class="text-[10px] opacity-60">Classic Fun</p></div>
     </div>
+
+
+
+<div onclick="window.prepareGame('cycle')" class="game-card glass-panel p-6 flex flex-col items-center gap-4 text-center group border-2 border-pink-400/30 relative cursor-pointer">
+    <div class="absolute top-2 left-2 px-2 py-1 rounded-lg border bg-pink-500/20 text-pink-200 border-pink-500/30 shadow-[0_0_10px_rgba(236,72,153,0.2)] backdrop-blur-md flex items-center gap-1.5 z-20">
+        <i data-lucide="heart" class="w-3 h-3"></i><span class="text-[9px] font-bold uppercase tracking-wider">FOR HER CARE</span>
+    </div>
+    <div class="w-14 h-14 rounded-2xl bg-pink-600/10 flex items-center justify-center border border-pink-500/20">
+        <i data-lucide="moon" class="w-7 h-7 text-pink-400"></i>
+    </div>
+    <div>
+        <h3 class="text-lg font-bold mb-1">Moon Cycle</h3>
+        <p class="text-[10px] opacity-60">Comfort & Pampering Mode</p>
+    </div>
+</div>
 
     <div onclick="window.showScreen('cards'); window.initCards();" class="game-card glass-panel p-6 flex flex-col items-center gap-4 text-center group relative">
         <div class="absolute top-2 left-2 px-2 py-1 rounded-lg border bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)] backdrop-blur-md flex items-center gap-1.5 z-20">
@@ -547,8 +651,10 @@
         <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20"><i data-lucide="eye-off" class="w-7 h-7 text-indigo-400"></i></div>
         <div><h3 class="text-lg font-bold mb-1">Sensory Blindfold</h3><p class="text-[10px] opacity-60">Guess the Touch</p></div>
     </div>
+    
+</div>
 
-</div>            <div class="mt-8 flex gap-4">
+            <div class="mt-8 flex gap-4">
 <button onclick="window.lockAppNow()" class="text-[10px] text-white/20 hover:text-red-500">
     Clear Access
 </button>
@@ -679,6 +785,51 @@
                 </div>
             </div>
         </div>
+
+<div id="screen-cycle" class="screen">
+    <div class="w-full max-w-md glass-panel p-6 relative flex flex-col items-center justify-center min-h-[85vh] border-2 border-pink-300/20 shadow-[0_0_60px_rgba(244,114,182,0.1)]">
+        <button onclick="window.goToHome()" class="absolute top-4 left-4 p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors z-20">
+            <i data-lucide="arrow-left" class="w-5 h-5 text-white"></i>
+        </button>
+
+        <div id="cycle-intro" class="text-center w-full">
+            <div class="w-24 h-24 bg-pink-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-pink-400/50 animate-pulse">
+                <i data-lucide="moon" class="w-12 h-12 text-pink-300"></i>
+            </div>
+            <h2 class="text-3xl font-bold fancy-font text-pink-200 mb-2">Her Sanctuary 🌸</h2>
+            <p class="text-sm opacity-70 mb-8 px-4">She chooses the mood.<br>He provides the care.</p>
+            
+            <p class="text-xs font-bold uppercase tracking-widest text-pink-400 mb-4">HOW IS SHE FEELING?</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="window.triggerCycleTask('pain')" class="p-4 rounded-xl bg-red-900/30 border border-red-500/30 hover:bg-red-900/50 transition-all flex flex-col items-center gap-2">
+                    <i data-lucide="frown" class="w-8 h-8 text-red-300"></i><span class="text-xs font-bold text-red-200">Pain / Cramps</span>
+                </button>
+                <button onclick="window.triggerCycleTask('emotional')" class="p-4 rounded-xl bg-blue-900/30 border border-blue-500/30 hover:bg-blue-900/50 transition-all flex flex-col items-center gap-2">
+                    <i data-lucide="cloud-rain" class="w-8 h-8 text-blue-300"></i><span class="text-xs font-bold text-blue-200">Emotional</span>
+                </button>
+                <button onclick="window.triggerCycleTask('hungry')" class="p-4 rounded-xl bg-orange-900/30 border border-orange-500/30 hover:bg-orange-900/50 transition-all flex flex-col items-center gap-2">
+                    <i data-lucide="utensils" class="w-8 h-8 text-orange-300"></i><span class="text-xs font-bold text-orange-200">Cravings</span>
+                </button>
+                <button onclick="window.triggerCycleTask('clingy')" class="p-4 rounded-xl bg-purple-900/30 border border-purple-500/30 hover:bg-purple-900/50 transition-all flex flex-col items-center gap-2">
+                    <i data-lucide="heart-handshake" class="w-8 h-8 text-purple-300"></i><span class="text-xs font-bold text-purple-200">Need Love</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="cycle-result" class="hidden flex-col items-center text-center w-full">
+            <div class="mb-6">
+                <p class="text-[10px] uppercase tracking-widest opacity-50 mb-1">MOOD:</p>
+                <h3 id="cycle-mood-display" class="text-xl font-bold text-pink-300">...</h3>
+            </div>
+            <div class="bg-white/10 p-6 rounded-2xl border border-pink-400/40 w-full mb-8 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-pink-400"></div>
+                <p class="text-[10px] font-bold uppercase mb-2 text-pink-200">CARE TASK:</p>
+                <h2 id="cycle-task-display" class="text-xl md:text-2xl font-black text-white fancy-font leading-relaxed">...</h2>
+            </div>
+            <button onclick="window.initCycleGame()" class="px-8 py-3 rounded-xl border border-white/20 hover:bg-white/10 text-sm font-bold">Check In Again 🔄</button>
+        </div>
+    </div>
+</div>
 
         <!-- 5. AI STORY (Mobile-Optimized Width) -->
         <div id="screen-story" class="screen">
@@ -1941,559 +2092,199 @@ window.checkLicensingStatus = () => true;
             }
         }
 
-        function handleReceivedData(data) {
-    console.log("Received data:", data);
-    
-    // Safety: Data ko sahi se unpack karo
+// ========================================================
+// 🛡️ ALL-IN-ONE MULTIPLAYER SYNC ENGINE (REPLACE FULL BLOCK)
+// ========================================================
+
+window.handleReceivedData = (data) => {
+    console.log("📡 Data Received:", data);
     const payload = data.payload || data; 
-    const type = payload.type || data.type || data; // Kabhi kabhi type direct data mein hota hai
+    const type = data.type || payload.type; 
+    const partnerRole = window.state.myRole === 'Him' ? 'Her' : 'Him';
 
     switch (type) {
-
-        // --- 1. CONN_TEST (Agar ye aaye toh bhi Chat dikhao) ---
+        // --- 1. CONNECTION & CHAT ---
         case 'CONN_TEST':
             window.showFeedback("Partner Connected! ❤️");
             document.getElementById('chat-toggle-btn').classList.remove('hidden');
             document.getElementById('partner-status').classList.remove('hidden');
             break; 
 
-        // --- 2. INIT NAMES (Yahan Chat aur Loading Fix dono hai) ---
         case 'INIT_NAMES':
-            // Sabse pehle CHAT aur STATUS dikhao (Ye line zaroori hai)
             document.getElementById('chat-toggle-btn').classList.remove('hidden');
             document.getElementById('partner-status').classList.remove('hidden');
-
-            // Naam set karo
-            const myRole = window.state.myRole;
-            const partnerRole = myRole === 'Him' ? 'Her' : 'Him';
-            
-            // Check karo agar payload mein naam hai
-            if(payload.partnerName) {
-                window.state.names[partnerRole] = payload.partnerName;
-            }
-            
-            // Input boxes update karo
-            if(document.getElementById('input-him')) document.getElementById('input-him').value = window.state.names.Him;
-            if(document.getElementById('input-her')) document.getElementById('input-her').value = window.state.names.Her;
-            
-            // --- LOADING FIX: Game start karo ---
+            if(payload.partnerName) window.state.names[partnerRole] = payload.partnerName;
             if(window.startGameSuite) window.startGameSuite(); 
-            
-            // Feedback
-            window.showFeedback(`Connected with ${window.state.names[partnerRole]}!`);
-            
-            // Data Sync karo (Host vs Client)
             if (!window.state.isHost) {
                 sendStateUpdate('SYNC_STATE_REQUEST');
             } else {
                 sendStateUpdate('SYNC_FULL_STATE', { 
                     monopoly: window.state.monopoly, 
-                    vault: savedVault || [], 
-                    couponStatus: couponStatus || {},
                     todTurn: window.state.todTurn || 'Him',
-                    nhie: window.state.nhie, 
+                    nhie: window.state.nhie,
                     memory: window.state.memory
                 });
-                // Ye loading screen hatata hai
                 if(window.showMultiplayerStep) window.showMultiplayerStep(5);
             }
             break;
 
-        // --- ISKE NEECHE BAAKI CASES (SYNC_STATE_REQUEST wagera) HONGE ---                case 'SYNC_STATE_REQUEST':
-                    if (window.state.isHost) {
-                        sendStateUpdate('SYNC_FULL_STATE', { 
-                            monopoly: window.state.monopoly, 
-                            vault: savedVault, 
-                            couponStatus: couponStatus,
-                            todTurn: window.state.todTurn,
-                            nhie: window.state.nhie,
-                            memory: window.state.memory
-                        });
-                    }
-                    break;
-                case 'SYNC_FULL_STATE':
-                    window.state.monopoly = payload.monopoly;
-                    savedVault = payload.vault;
-                    couponStatus = payload.couponStatus;
-                    window.state.todTurn = payload.todTurn || 'Him'; 
-                    window.state.nhie = payload.nhie || { currentQ: 0, himScore: 5, herScore: 5, turn: 'Him', statements: [] };
-                    window.state.memory = payload.memory || { cards: [], flipped: [], matched: [], turn: 'Him', score: { Him: 0, Her: 0 }, isLocked: false, tempMatch: 0 };
-                    localStorage.setItem('contractVault', JSON.stringify(savedVault));
-                    localStorage.setItem('couponStatus', JSON.stringify(couponStatus));
-                    window.renderMonopolyBoard(); 
-                    window.renderCoupons(); 
-                    window.todResetUI();
-                    window.updateMemoryUI();
-                    window.renderMemoryBoard();
-                    window.showMultiplayerStep(5);
-                    break;
-                case 'UPDATE_MONOPOLY':
-                    window.state.monopoly = payload;
-                    window.updateMonopolyTokens();
-                    window.renderMonopolyBoard(); 
-                    document.getElementById('mono-msg').textContent = `Partner rolled a ${payload.lastRoll}. ${window.state.names[window.state.monopoly.turn]}'s turn now.`;
-                    
-                    const movedPlayer = window.state.monopoly.turn === 'Him' ? 'Her' : 'Him';
-                    const newPos = movedPlayer === 'Him' ? window.state.monopoly.p1 : window.state.monopoly.p2;
-                    const tile = monoMap.find(t => t.id === newPos);
-                    if(tile) {
-                         const centerText = document.getElementById('mono-active-desc');
-                         if(centerText) centerText.textContent = tile.detail;
-                    }
-                    break;
-                case 'UPDATE_VAULT':
-                    savedVault = payload.vault;
-                    couponStatus = payload.couponStatus;
-                    localStorage.setItem('contractVault', JSON.stringify(savedVault));
-                    localStorage.setItem('couponStatus', JSON.stringify(couponStatus));
-                    window.showFeedback("Vault/Coupon update received from partner!");
-                    window.renderVault();
-                    window.renderCoupons();
-                    break;
-                case 'MONOPOLY_WIN':
-                    window.showFeedback(`👑 ${payload.winner} Won Monopoly! Redirecting to Vault...`);
-                    setTimeout(() => { window.showVault(); }, 1500);
-                    break;
-                // --- NHIE SYNC LOGIC (MERGED) ---
-                case 'NHIE_INIT':
-                    if (!window.state.isHost) {
-                        window.state.nhie.statements = payload.statements;
-                        window.state.nhie.turn = payload.turn;
-                        window.state.nhie.currentQ = 0; window.state.nhie.himScore = 5; window.state.nhie.herScore = 5;
-                        window.updateNHIEUI();
-                        window.showFeedback("Never Have I Ever game initialized by partner.");
-                    }
-                    break;
-                case 'NHIE_QUESTION':
-                    window.state.nhie.currentQ = payload.currentQ;
-                    window.state.nhie.turn = payload.turn;
-                    window.updateNHIEUI();
-                    window.showFeedback(`Next statement is read by ${window.state.names[payload.turn]}.`);
-                    break;
-                case 'NHIE_FINGER_DOWN':
-                    const player = payload.player;
-                    const scoreKey = player === 'Him' ? 'himScore' : 'herScore';
-                    if (window.state.nhie[scoreKey] > 0) {
-                        window.state.nhie[scoreKey] -= 1;
-                        window.updateNHIEUI();
-                        window.showFeedback(`${window.state.names[player]} confessed! Remaining: ${window.state.nhie[scoreKey]}`);
-                    }
-                    break;
-                case 'NHIE_END':
-                    document.getElementById('nhie-game-area').classList.add('hidden');
-                    document.getElementById('nhie-punishment-area').classList.remove('hidden');
-                    document.getElementById('nhie-loser-name').textContent = `${window.state.names[payload.loser]} is the LOSER! (Zero Fingers)`;
-                    document.getElementById('nhie-winner-name').textContent = `${window.state.names[payload.winner]} is the WINNER and chooses the punishment.`;
-                    
-                    const listEl = document.getElementById('nhie-punishment-list'); listEl.innerHTML = ''; 
-                    nhiePunishments.forEach((p) => {
-                        const btn = document.createElement('button');
-                        btn.className = 'w-full text-left p-4 rounded-xl border border-red-500/30 bg-red-500/10 transition-all flex flex-col items-start group cursor-pointer opacity-50 cursor-not-allowed';
-                        btn.innerHTML = `<div class="flex items-center gap-2 mb-1"><i data-lucide="${p.icon}" class="w-5 h-5 text-red-300"></i><span class="font-bold text-lg text-red-200">${p.title}</span></div><p class="text-xs opacity-70">${p.desc}</p>`;
-                        listEl.appendChild(btn);
-                    });
-                    if(window.lucide) lucide.createIcons();
-                    break;
-                // --- END NHIE SYNC LOGIC ---
-
-                // --- MEMORY SYNC LOGIC (MERGED) ---
-                case 'MEMORY_INIT':
-                    if (!window.state.isHost) {
-                        window.state.memory.cards = payload.cards.map(c => ({...c, isFlipped: false}));
-                        window.state.memory.turn = payload.turn;
-                        window.state.memory.score = { Him: 0, Her: 0 };
-                        window.state.memory.matched = payload.cards.filter(c => c.isMatched).map((c, i) => i);
-                        window.state.memory.flipped = [];
-                        window.state.memory.isLocked = false;
-                        window.state.memory.tempMatch = 0;
-                        window.renderMemoryBoard();
-                        window.updateMemoryUI();
-                        document.getElementById('memory-action-log').textContent = `Game started by partner! ${window.state.names[payload.turn]}'s turn.`;
-                    }
-                    break;
-                case 'MEMORY_FLIP':
-                    if (window.state.memory.flipped.length < 2) {
-                        window.state.memory.cards[payload.index].isFlipped = true;
-                        window.state.memory.flipped.push(payload.index);
-                        window.renderMemoryBoard();
-                        if (window.state.memory.flipped.length === 2) {
-                             window.state.memory.isLocked = true;
-                             document.getElementById('memory-action-log').textContent = `Partner flipped two cards. Checking match...`;
-                        }
-                    }
-                    break;
-                case 'MEMORY_MATCH':
-                    window.state.memory.cards[payload.idx1].isFlipped = true;
-                    window.state.memory.cards[payload.idx2].isFlipped = true;
-                    window.state.memory.cards[payload.idx1].isMatched = true;
-                    window.state.memory.cards[payload.idx2].isMatched = true;
-                    window.state.memory.matched.push(payload.idx1, payload.idx2);
-                    window.state.memory.score = payload.score;
-                    window.state.memory.flipped = [];
-                    window.state.memory.isLocked = false;
-                    window.state.memory.tempMatch = payload.tempMatch;
-                    window.renderMemoryBoard();
-                    window.updateMemoryUI();
-                    document.getElementById('memory-action-log').textContent = payload.message;
-                    break;
-                case 'MEMORY_NO_MATCH_TURN':
-                    // Flip back non-matched cards
-                    window.state.memory.cards.forEach(c => { if(!c.isMatched) c.isFlipped = false; });
-                    window.state.memory.flipped = [];
-                    window.state.memory.isLocked = false;
-                    window.state.memory.turn = payload.turn;
-                    window.state.memory.tempMatch = 0;
-                    window.renderMemoryBoard();
-                    window.updateMemoryUI();
-                    document.getElementById('memory-action-log').textContent = `No Match! Turn change. It's now ${window.state.names[payload.turn]}'s turn.`;
-                    break;
-                case 'MEMORY_SHUFFLE':
-                    // Update entire card array and state after shuffling
-                    window.state.memory.cards = payload.cards;
-                    window.state.memory.turn = payload.turn;
-                    window.state.memory.flipped = [];
-                    window.state.memory.isLocked = false;
-                    window.state.memory.tempMatch = 0;
-                    window.renderMemoryBoard();
-                    window.updateMemoryUI();
-                    document.getElementById('memory-action-log').textContent = `Chain break! Cards Shuffled! It's now ${window.state.names[payload.turn]}'s turn.`;
-                    break;
-                // --- END MEMORY SYNC LOGIC ---
-
-                case 'TOD_ACTION':
-                    // Just show the action, do NOT change the turn yet.
-                    document.getElementById('tod-turn').textContent = `${window.state.names[window.state.todTurn]}'s Turn`; // Keep current turn visible
-                    document.getElementById('tod-choice-btns').classList.add('hidden');
-                    document.getElementById('tod-result').classList.remove('hidden');
-                    document.getElementById('tod-result').classList.add('flex');
-                    document.getElementById('tod-type-badge').textContent = payload.type;
-                    document.getElementById('tod-text').textContent = payload.text;
-                    
-                    // Disable the Next Turn button for the user who *received* the action, 
-                    // only the original player (whose turn it still is) can proceed.
-                    document.querySelector('#tod-result button').disabled = (window.state.todTurn !== window.state.myRole);
-                    break;
-                case 'TOD_NEXT':
-                    // Now update the turn on both sides and reset UI
-                    window.state.todTurn = payload.turn;
-                    window.todResetUI();
-                    window.showFeedback(`It is now ${window.state.names[window.state.todTurn]}'s turn!`);
-                    break;
-                case 'CARD_ROLL_START':
-                    document.getElementById('mystery-dice-box').classList.add('mystery-dice-rolling');
-                    document.getElementById('active-card').classList.remove('visible', 'flipped');
-                    document.getElementById('card-placeholder').style.display = 'block';
-                    document.getElementById('card-placeholder').textContent = "Partner Rolling...";
-                    break;
-                case 'CARD_REVEAL':
-                    document.getElementById('mystery-dice-box').classList.remove('mystery-dice-rolling');
-                    document.getElementById('dice-val').textContent = payload.roll;
-                    window.revealCard(payload.index);
-                    break;
-                case 'RPS_MOVE':
-                    if (payload.couponId === window.state.rps.currentCoupon?.id) {
-                         // RPS is Him (P1) vs Her (P2)
-                         if (payload.role === 'Him') {
-                             window.state.rps.p1Move = payload.move;
-                             window.showFeedback(`${window.state.names.Him} moved! Now your turn.`);
-                             document.getElementById('p1-name-display').textContent = `${window.state.names.Her}'s Turn (Your Move!)`;
-                             document.querySelectorAll('.rps-btn').forEach(btn => btn.disabled = (window.state.myRole !== 'Her'));
-                         } else if (payload.role === 'Her' && window.state.rps.p1Move) {
-                             window.state.rps.p2Move = payload.move;
-                             window.showFeedback(`${window.state.names.Her} moved! Showing result...`);
-                             window.startRPSShowdown(window.state.rps.p1Move, window.state.rps.p2Move);
-                         }
-                    }
-                    break;
-                case 'RPS_WIN_SYNC':
-                     // This syncs the result/contract after the winner's device processes it.
-                    savedVault = payload.vault;
-                    couponStatus = payload.couponStatus;
-                    localStorage.setItem('contractVault', JSON.stringify(savedVault));
-                    localStorage.setItem('couponStatus', JSON.stringify(couponStatus));
-                    // Re-render coupons to show locked state for the day
-                    window.renderCoupons();
-                    break;
-                    
-                                        // --- RUSSIAN ROULETTE SYNC (FIXED VARIABLE SCOPE) ---
-        case 'ROULETTE_INIT':
-            // Galti yahan thi: 'window.' hata diya hai taaki asli variable update ho
-            rouletteTurn = payload.starter;
-            currentChamber = 1;
-            bulletChamber = payload.bullet; 
-            
-            // UI Show
-            document.getElementById('roulette-intro').classList.add('hidden');
-            document.getElementById('roulette-game').classList.remove('hidden');
-            document.getElementById('roulette-game').classList.add('flex');
-            
-            // Visual Reset
-            const cylInit = document.getElementById('cylinder-visual');
-            cylInit.style.transition = "none";
-            cylInit.style.transform = "rotate(0deg)";
-            
-            window.updateRouletteUI("Game Started. Bullet Locked.");
-            break;
-
-        case 'ROULETTE_TRIGGER':
-            // Sync Chamber Count
-            currentChamber = payload.chamber; // 'window.' hataya
-            
-            // Animation
-            const rot = currentChamber * 60; 
-            document.getElementById('cylinder-visual').style.transform = `rotate(${rot}deg)`;
-
-            // Result Show
-            if (payload.result === 'BANG') {
-                window.handleRouletteDeath(payload.task);
-            } else {
-                window.handleRouletteSafe(payload.task);
-            }
-            break;
-
-        case 'ROULETTE_NEXT':
-            // Sync Turn Change
-            currentChamber = payload.nextChamber; // 'window.' hataya
-            rouletteTurn = payload.turn;          // 'window.' hataya (Ye sabse zaroori tha!)
-            
-            // Hide Overlay
-            document.getElementById('roulette-safe-overlay').classList.add('hidden');
-            document.getElementById('roulette-safe-overlay').classList.remove('flex');
-            
-            // Enable Button
-            const btn = document.getElementById('btn-trigger');
-            btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            
-            window.updateRouletteUI("Partner passed the gun.");
-            break;
-
-        // --- LUST BOMB SYNC START ---
-        case 'BOMB_ACTION':
-            // Action check karo: Start, Pass, ya Explode
-            if (payload.action === 'START') {
-                // Timer sync karke start karo
-                window.startBombGame(true, payload.value);
-            } 
-            else if (payload.action === 'PASS') {
-                // Task sync karke update karo
-                window.passTheBomb(true, payload.value);
-            } 
-            else if (payload.action === 'EXPLODE') {
-                // Same punishment dikhao aur timer roko
-                window.explodeBomb(true, payload.value);
-            }
-            break;
-        // --- LUST BOMB SYNC END ---
-        
-                // --- SPICE & DICE SYNC START ---
-        case 'SPICE_SPIN':
-            // Partner ne wheel ghumaya, hum bhi wahi same result dikhayenge
-            window.performSpiceSpin(payload.actionIndex, payload.bodyIndex);
-            break;
-        // --- SPICE & DICE SYNC END ---
-        
-                // --- PANDORA SYNC START ---
-        case 'PANDORA_OPEN':
-            const pCard = document.getElementById(`pandora-box-${payload.index}`);
-            const pBack = document.getElementById(`pandora-back-${payload.index}`);
-            
-            // Partner ne box khola, hum bhi wahi kholenge with SAME text
-            window.openPandoraBox(payload.index, pCard, pBack, payload.item, true, payload.text);
-            break;
-        // --- PANDORA SYNC END ---
-        
-                // --- CHAT & STATUS SYNC START ---
-        
-        // CASE 1: PARTNER STATUS CHANGED
         case 'STATUS_UPDATE':
             const statusBox = document.getElementById('partner-status');
             const statusText = document.getElementById('partner-status-text');
-            
-            // Show status box
-            statusBox.classList.remove('hidden');
-            statusText.textContent = `Partner is on: ${payload.screenName}`;
-            
-            // 5 second baad hide kar sakte ho agar chaho, ya permanent rakho
-            // setTimeout(() => statusBox.classList.add('hidden'), 5000);
+            if(statusBox) statusBox.classList.remove('hidden');
+            if(statusText) statusText.textContent = `Partner: ${payload.screenName}`;
             break;
 
-        // CASE 2: CHAT MESSAGE RECEIVED
         case 'CHAT_MSG':
-            // Message dikhao
-            appendMessage(payload.text, 'partner');
-            
-            // Agar Chat band hai, toh Badge (Red Dot) dikhao aur vibrate karo
-            const chatBox = document.getElementById('game-chat-box');
-            if (chatBox.classList.contains('hidden')) {
-                document.getElementById('chat-badge').classList.remove('hidden');
-                if(navigator.vibrate) navigator.vibrate([50, 50]);
-            }
+            if(window.appendMessage) appendMessage(payload.text, 'partner');
+            document.getElementById('chat-badge').classList.remove('hidden');
             break;
 
-        // --- CHAT & STATUS SYNC END ---
-        
-
-    // Iske baad default: aayega, usko mat chhedna
-    default:
-        console.log("Unknown data type:", data.type);
-        
+        // --- 2. TRUTH OR DARE / LUST BOMB / PANDORA ---
+        case 'TOD_ACTION':
+        case 'BOMB_ACTION':
+        case 'PANDORA_ACTION':
+            if(type === 'BOMB_ACTION') {
+                if (payload.action === 'START') window.startBombGame(true, payload.value);
+                else if (payload.action === 'PASS') window.passTheBomb(true, payload.value);
+                else if (payload.action === 'EXPLODE') window.explodeBomb(true, payload.value);
+                break;
             }
+            window.state.todTurn = payload.turn || window.state.todTurn;
+            document.getElementById('tod-turn').textContent = `${window.state.names[window.state.todTurn]}'s Turn`;
+            document.getElementById('tod-choice-btns').classList.add('hidden');
+            document.getElementById('tod-result').classList.remove('hidden');
+            document.getElementById('tod-text').textContent = payload.text;
+            document.getElementById('tod-type-badge').textContent = payload.type || "ACTION";
+            break;
+
+        case 'TOD_NEXT':
+            window.state.todTurn = payload.turn;
+            window.todResetUI();
+            break;
+
+        // --- 3. DICE / SPICE & DICE ---
+        case 'SPICE_SPIN':
+            if(window.performSpiceSpin) window.performSpiceSpin(payload.actionIndex, payload.bodyIndex);
+            break;
+
+        case 'CARD_REVEAL':
+            document.getElementById('dice-val').textContent = payload.roll;
+            window.revealCard(payload.index);
+            break;
+
+        // --- 4. RUSSIAN ROULETTE ---
+        case 'ROULETTE_INIT':
+            window.rouletteTurn = payload.starter;
+            window.bulletChamber = payload.bullet;
+            window.currentChamber = 1;
+            document.getElementById('roulette-intro').classList.add('hidden');
+            document.getElementById('roulette-game').classList.remove('hidden');
+            window.updateRouletteUI("Game Started.");
+            break;
+
+        case 'ROULETTE_TRIGGER':
+            window.currentChamber = payload.chamber;
+            if (payload.result === 'BANG') window.handleRouletteDeath(payload.task);
+            else window.handleRouletteSafe(payload.task);
+            break;
+
+        case 'ROULETTE_NEXT':
+            window.currentChamber = payload.nextChamber;
+            window.rouletteTurn = payload.turn;
+            document.getElementById('roulette-safe-overlay').classList.add('hidden');
+            document.getElementById('btn-trigger').disabled = false;
+            break;
+
+        // --- 5. PANDORA'S BOX OPEN ---
+        case 'PANDORA_OPEN':
+            const pCard = document.getElementById(`pandora-box-${payload.index}`);
+            const pBack = document.getElementById(`pandora-back-${payload.index}`);
+            window.openPandoraBox(payload.index, pCard, pBack, payload.item, true, payload.text);
+            break;
+
+        // --- 6. MONOPOLY & NHIE & MEMORY ---
+        case 'UPDATE_MONOPOLY':
+            window.state.monopoly = payload;
+            window.updateMonopolyTokens();
+            break;
+
+        case 'NHIE_FINGER_DOWN':
+            const scoreKey = payload.player === 'Him' ? 'himScore' : 'herScore';
+            window.state.nhie[scoreKey]--;
+            window.updateNHIEUI();
+            break;
+
+        case 'MEMORY_FLIP':
+            if(window.handleCardClick) window.handleCardClick(payload.index, true);
+            break;
+
+        case 'SYNC_FULL_STATE':
+            window.state.monopoly = payload.monopoly;
+            window.state.todTurn = payload.todTurn;
+            window.state.nhie = payload.nhie;
+            window.state.memory = payload.memory;
+            window.showMultiplayerStep(5);
+            break;
+    }
+};
+
+window.initPeer = (isHost, connectToId = null) => {
+    const peerConfig = { debug: 0 };
+    if (window.state.myPeer) window.state.myPeer.destroy();
+
+    try {
+        if (isHost) {
+            const shortCode = Math.random().toString(36).substring(2, 7).toUpperCase();
+            window.state.myPeer = new Peer(shortCode, peerConfig);
+        } else {
+            window.state.myPeer = new Peer(undefined, peerConfig);
         }
-        
-        // Multiplayer setup steps (Unchanged)
-        window.openMultiplayerModal = () => {
-            
-            if (window.state.isMultiplayer) {
-                window.showMultiplayerStep(5); 
-                document.getElementById('mp-host-info').textContent = window.state.isHost ? `${window.state.names.Him} (You)` : `${window.state.names.Him} (Partner)`;
-                document.getElementById('mp-guest-info').textContent = window.state.isHost ? `${window.state.names.Her} (Partner)` : `${window.state.names.Her} (You)`;
-                document.getElementById('multiplayer-modal').classList.add('active');
-            } else {
-                document.getElementById('mp-player-name').value = document.getElementById('input-him').value;
-                document.getElementById('mp-player-gender').value = 'Him';
-                window.showMultiplayerStep(1);
-            }
-        };
+    } catch (e) {
+        window.showFeedback("Connection failed.", true);
+        return;
+    }
 
-        window.closeMultiplayerModal = (start = false) => {
-            document.getElementById('multiplayer-modal').classList.remove('active');
-            if (start) {
-                window.showScreen('home');
-            }
-        };
-        
-        window.showMultiplayerStep = (step) => {
-            ['1', '2', '3', '4', '5'].forEach(s => document.getElementById(`mp-step-${s}`).classList.add('hidden'));
-            document.getElementById(`mp-step-${step}`).classList.remove('hidden');
-            document.getElementById('multiplayer-modal').classList.add('active');
-
-            if (step === 2) {
-                const name = document.getElementById('mp-player-name').value.trim() || "Player";
-                document.getElementById('mp-welcome-msg').textContent = `Welcome, ${name}! Now, choose your role: Dominant or Submissive.`;
-            }
-            if(window.lucide) lucide.createIcons();
-        };
-
-        window.hostGame = () => {
-            window.state.isHost = true;
-            window.state.myRole = document.getElementById('mp-player-gender').value;
-            const myName = document.getElementById('mp-player-name').value.trim() || "Player";
-            
-            window.state.names[window.state.myRole] = myName;
-            
-            document.getElementById('input-him').value = window.state.names.Him;
-            document.getElementById('input-her').value = window.state.names.Her;
-            
-            window.showMultiplayerStep(4);
-            document.getElementById('mp-status-heading').textContent = "Hosting Game...";
-            document.getElementById('mp-status-desc').textContent = "Generating room code (ID)...";
-            document.getElementById('mp-host-code-display').classList.remove('hidden');
-
-            window.initPeer(true);
-        };
-
-        window.joinGame = () => {
-            window.state.isHost = false;
-            window.state.myRole = document.getElementById('mp-player-gender').value;
-            const myName = document.getElementById('mp-player-name').value.trim() || "Player";
-            const peerId = document.getElementById('mp-join-code').value.trim();
-
-            if (!peerId) {
-                window.showFeedback("Enter the Host's Secret Key.", true);
-                return;
-            }
-            
-            window.state.names[window.state.myRole] = myName; 
-            
-            document.getElementById('input-him').value = window.state.names.Him;
-            document.getElementById('input-her').value = window.state.names.Her;
-            
-            window.showMultiplayerStep(4);
-            document.getElementById('mp-status-heading').textContent = "Joining Room...";
-            document.getElementById('mp-status-desc').textContent = `Connecting to: ${peerId}`;
-            document.getElementById('mp-host-code-display').classList.add('hidden');
-            
-            window.initPeer(false, peerId);
-        };
-        
-        window.initPeer = (isHost, connectToId = null) => {
-            const peerConfig = { debug: 0 }; 
-            
-            if (window.state.myPeer) { window.state.myPeer.destroy(); }
-
-            try {
-                window.state.myPeer = new Peer(undefined, peerConfig);
-            } catch (e) {
-                console.error("PeerJS initialization error:", e);
-                window.showFeedback("Connection failed. The stars are misaligned. Try again.", true);
-                window.closeMultiplayerModal();
-                return;
-            }
-
-            window.state.myPeer.on('open', (id) => {
-                window.state.peerId = id;
-                document.getElementById('mp-peer-id').textContent = id;
-                document.getElementById('mp-status-desc').textContent = isHost 
-                    ? "Room Code generated. Waiting for partner to join..." 
-                    : `Connecting to Host: ${connectToId}`;
-
-                if (isHost) {
-                    window.state.myPeer.on('connection', (conn) => {
-                        window.state.connection = conn;
-                        setupConnection(conn);
-                    });
-                } else if (connectToId) {
-                    const conn = window.state.myPeer.connect(connectToId);
-                    window.state.connection = conn;
-                    setupConnection(conn);
-                }
+    window.state.myPeer.on('open', (id) => {
+        window.state.peerId = id;
+        document.getElementById('mp-peer-id').textContent = id;
+        if (isHost) {
+            window.state.myPeer.on('connection', (conn) => {
+                window.state.connection = conn;
+                setupConnection(conn);
             });
-
-            window.state.myPeer.on('error', (err) => {
-                console.error("PeerJS Error:", err);
-                window.showFeedback(`Connection Error: ${err.message || err.type}`, true);
-                window.state.isMultiplayer = false;
-                window.updateMultiplayerUI();
-                if (window.state.myPeer && !window.state.myPeer.destroyed) {
-                    window.state.myPeer.destroy();
-                }
-            });
-            
-            window.state.myPeer.on('disconnected', () => {
-                console.log("PeerJS Disconnected");
-                window.state.isMultiplayer = false;
-                window.updateMultiplayerUI();
-                window.showFeedback("Connection lost (Disconnected).", true);
-            });
-        };
-
-        function setupConnection(conn) {
-            conn.on('open', () => {
-                window.state.isMultiplayer = true;
-                window.updateMultiplayerUI();
-                console.log("P2P Connection Established!");
-                
-                sendStateUpdate('INIT_NAMES', {
-                    partnerName: window.state.names[window.state.myRole],
-                });
-
-                conn.on('data', handleReceivedData);
-                
-                conn.on('close', () => {
-                    window.state.isMultiplayer = false;
-                    window.updateMultiplayerUI();
-                    window.showFeedback("Partner disconnected.", true);
-                });
-                conn.on('error', (err) => {
-                    console.error("Connection error:", err);
-                    window.state.isMultiplayer = false;
-                    window.updateMultiplayerUI();
-                    window.showFeedback("Connection error with partner.", true);
-                });
-            });
+        } else if (connectToId) {
+            const conn = window.state.myPeer.connect(connectToId);
+            window.state.connection = conn;
+            setupConnection(conn);
         }
-        // --- END MULTIPLAYER P2P LOGIC ---
+    });
+};
+
+function setupConnection(conn) {
+    conn.on('open', () => {
+        window.state.isMultiplayer = true;
+        window.updateMultiplayerUI();
+        sendStateUpdate('INIT_NAMES', { partnerName: window.state.names[window.state.myRole] });
+        
+        // YAHAN CHANGE HAI: 'window.' lagana zaroori hai
+        conn.on('data', (data) => window.handleReceivedData(data)); 
+    });
+
+    // Ye brackets ab function ke andar hain (Pehle bahar the, isliye error tha)
+    conn.on('close', () => {
+        window.state.isMultiplayer = false;
+        window.updateMultiplayerUI();
+        window.showFeedback("Partner disconnected.", true);
+    });
+
+    conn.on('error', (err) => {
+        console.error("Connection error:", err);
+        window.state.isMultiplayer = false;
+        window.updateMultiplayerUI();
+        window.showFeedback("Connection error with partner.", true);
+    });
+}        // --- END MULTIPLAYER P2P LOGIC ---
 
         // --- SECURITY LOGIC (Unchanged) ---
         window.savePasswords = () => localStorage.setItem('vaultPasswords', JSON.stringify(window.state.passwords));
@@ -6742,23 +6533,26 @@ document.getElementById('chat-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') window.sendChatMessage();
 });
 
-// 3. DISPLAY MESSAGE HELPER
-function appendMessage(text, sender) {
+// 3. DISPLAY MESSAGE HELPER - FIXED
+window.appendMessage = (text, sender) => {
     const container = document.getElementById('chat-messages');
     const div = document.createElement('div');
     
     if (sender === 'me') {
         div.className = "flex justify-end";
-        div.innerHTML = `<div class="bg-pink-600 text-white px-3 py-2 rounded-l-lg rounded-tr-lg max-w-[80%]">${text}</div>`;
+        div.innerHTML = `<div class="bg-pink-600 text-white px-3 py-2 rounded-l-lg rounded-tr-lg max-w-[80%] shadow-md text-sm">${text}</div>`;
     } else {
         div.className = "flex justify-start";
-        div.innerHTML = `<div class="bg-white/20 text-white px-3 py-2 rounded-r-lg rounded-tl-lg max-w-[80%]">${text}</div>`;
+        div.innerHTML = `<div class="bg-white/20 text-white px-3 py-2 rounded-r-lg rounded-tl-lg max-w-[80%] border border-white/10 shadow-md text-sm">${text}</div>`;
     }
     
     container.appendChild(div);
-    // Scroll to bottom
-    container.scrollTop = container.scrollHeight;
-}
+    // Scroll to bottom properly
+    setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+    }, 50);
+};
+
 
 
 
@@ -7471,10 +7265,430 @@ window.initScratch = () => {
     }
 };
 
+// ==========================================
+// 🛠️ MULTIPLAYER UI LOGIC (YE MISSING THA)
+// ==========================================
 
+window.openMultiplayerModal = () => {
+    document.getElementById('multiplayer-modal').classList.add('active');
+    window.showMultiplayerStep(1); // Hamesha Step 1 se shuru karein
+};
+
+window.closeMultiplayerModal = (startGame = false) => {
+    document.getElementById('multiplayer-modal').classList.remove('active');
+    if (startGame) {
+        window.showScreen('home');
+        window.showFeedback("Multiplayer Connected! Enjoy.");
+    }
+};
+
+window.showMultiplayerStep = (step) => {
+    // Saare steps chhupa do
+    for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(`mp-step-${i}`);
+        if (el) el.classList.add('hidden');
+    }
+    // Sirf zaroorat wala step dikhao
+    const target = document.getElementById(`mp-step-${step}`);
+    if (target) target.classList.remove('hidden');
+
+    // Agar step 4 (Waiting) hai aur Host hai, toh Code dikhao
+    if (step === 4 && window.state.isHost) {
+        document.getElementById('mp-host-code-display').classList.remove('hidden');
+        document.getElementById('mp-status-desc').textContent = "Share this code with your partner:";
+    } else if (step === 4) {
+        document.getElementById('mp-host-code-display').classList.add('hidden');
+        document.getElementById('mp-status-desc').textContent = "Connecting to partner...";
+    }
+};
+
+window.hostGame = () => {
+    const name = document.getElementById('mp-player-name').value || "Player";
+    const gender = document.getElementById('mp-player-gender').value;
+    
+    // State set karo
+    window.state.myRole = gender;      
+    window.state.names[gender] = name; 
+    window.state.isHost = true;
+    
+    // UI update
+    window.showMultiplayerStep(4); 
+    
+    // PeerJS start karo (Host Mode)
+    window.initPeer(true);         
+};
+
+window.joinGame = () => {
+    const name = document.getElementById('mp-player-name').value || "Player";
+    const gender = document.getElementById('mp-player-gender').value;
+    const code = document.getElementById('mp-join-code').value.trim();
+
+    if (!code) {
+        window.showFeedback("Please enter a room code!", true);
+        return;
+    }
+
+    // State set karo
+    window.state.myRole = gender;
+    window.state.names[gender] = name;
+    window.state.isHost = false;
+
+    // UI update
+    window.showMultiplayerStep(4); 
+    
+    // PeerJS connect karo (Guest Mode)
+    window.initPeer(false, code);  
+};
+
+// =======================================================
+// 🌙 MOON CYCLE & 💰 BUSINESS ENGINE (ALL-IN-ONE)
+// =======================================================
+
+// --- 1. MOON CYCLE DATA ---
+const cycleTasks = {
+    pain: [
+        "Prepare a hot water bottle or heating pad for her lower back.",
+        "Give her a gentle foot massage for 10 minutes.",
+        "Rub her lower tummy gently (over clothes) until she feels better.",
+        "Make her a warm herbal tea or hot chocolate.",
+        "Let her rest her head on your lap and stroke her hair."
+    ],
+    emotional: [
+        "Give her a long, tight hug for 2 minutes. No talking needed.",
+        "Listen to her vent. Just listen, don't try to fix it.",
+        "Tell her 5 reasons why you love her right now.",
+        "Hold her hand and kiss her forehead tenderly.",
+        "Put on her favorite comfort movie and cuddle."
+    ],
+    hungry: [
+        "Go get (or order) her specific craving food RIGHT NOW.",
+        "Bring her a piece of chocolate and feed it to her.",
+        "Make her a snack plate with her favorite treats.",
+        "Offer to cook dinner so she doesn't have to move.",
+        "Bring her a glass of water without her asking."
+    ],
+    clingy: [
+        "Cuddle spooning style for 15 minutes.",
+        "Give her a gentle back scratch.",
+        "Kiss her neck softly and whisper sweet things.",
+        "Let her cling to you like a Koala while you sit.",
+        "Hold her close and just breathe together."
+    ]
+};
+
+// --- 2. MOON CYCLE FUNCTIONS ---
+window.initCycleGame = () => {
+    window.showScreen('cycle');
+    document.getElementById('cycle-intro').classList.remove('hidden');
+    document.getElementById('cycle-result').classList.add('hidden');
+    document.getElementById('cycle-result').classList.remove('flex');
+};
+
+window.triggerCycleTask = (mood) => {
+    const tasks = cycleTasks[mood];
+    const task = tasks[Math.floor(Math.random() * tasks.length)];
+    const moodText = mood.charAt(0).toUpperCase() + mood.slice(1);
+
+    window.updateCycleUI(moodText, task);
+
+    // Sync with Partner
+    if (window.state.isMultiplayer) {
+        sendStateUpdate('CYCLE_TASK_SYNC', { mood: moodText, task: task });
+        if (window.state.myRole === 'Her') {
+             window.showFeedback("Request sent to Him! ❤️");
+        }
+    }
+};
+
+window.updateCycleUI = (mood, task) => {
+    document.getElementById('cycle-intro').classList.add('hidden');
+    const res = document.getElementById('cycle-result');
+    res.classList.remove('hidden');
+    res.classList.add('flex');
+    document.getElementById('cycle-mood-display').textContent = mood;
+    document.getElementById('cycle-task-display').textContent = task;
+};
+
+// --- 3. STORE & LICENSE SYSTEM ---
+const SECRET_SALT = "INTIMATE_SPARKS_X_2026_LOVER"; 
+const MY_SECRET_AUTH = "SPARKS_VIP_2026"; // Matches Razorpay redirect
+
+// Open Store & Check Trial
+window.openStore = () => {
+    document.getElementById('store-modal').classList.add('active');
+    
+    // Check Trial Status
+    const uses = parseInt(localStorage.getItem('trial_uses') || '0');
+    const maxUses = 2;
+    document.getElementById('trial-status').textContent = `Uses Left: ${maxUses - uses}/${maxUses}`;
+    
+    if (uses >= maxUses) {
+        const btn = document.querySelector('#trial-card button');
+        if(btn) {
+            btn.disabled = true;
+            btn.textContent = "EXPIRED";
+            btn.className = "px-4 py-2 bg-gray-600 rounded-lg text-xs font-bold opacity-50 cursor-not-allowed";
+        }
+    }
+
+    // Check Active Pass
+    window.updateStoreUI();
+};
+
+window.updateStoreUI = () => {
+    const activeCode = localStorage.getItem('my_active_code');
+    const expiry = parseInt(localStorage.getItem('_px_t') || '0');
+    const banner = document.getElementById('active-pass-banner');
+
+    if (activeCode && expiry > Date.now()) {
+        const timeLeft = Math.ceil((expiry - Date.now()) / (1000 * 60 * 60)); // Hours
+        banner.classList.remove('hidden');
+        document.getElementById('display-active-code').textContent = activeCode;
+        document.getElementById('display-expiry').textContent = `Expires in: ${timeLeft} Hours`;
+    } else {
+        banner.classList.add('hidden');
+    }
+};
+
+window.activateTrial = () => {
+    const uses = parseInt(localStorage.getItem('trial_uses') || '0');
+    if (uses >= 2) return;
+
+    localStorage.setItem('trial_uses', uses + 1);
+    const expiryTime = Date.now() + (10 * 60 * 1000); // 10 Mins
+    localStorage.setItem('_px_t', expiryTime);
+    window.premiumExpiry = expiryTime;
+
+    window.showFeedback("🚀 10-Min Trial Activated!");
+    document.getElementById('store-modal').classList.remove('active');
+    setTimeout(() => location.reload(), 1000);
+};
+
+// Payment Redirect Logic
+window.openPayment = (plan) => {
+    // ⚠️ REPLACE THESE LINKS WITH YOUR ACTUAL RAZORPAY PAGE LINKS
+    let link = "";
+    if (plan === 'DAY') link = "https://rzp.io/l/YOUR_DAY_LINK"; 
+    if (plan === 'WEEK') link = "https://rzp.io/l/YOUR_WEEK_LINK";
+    if (plan === 'MNTH') link = "https://rzp.io/l/YOUR_MONTH_LINK";
+
+    if(link) window.open(link, '_self'); 
+    else alert("Payment links not set in code!");
+};
+
+// Validate Manual Code
+window.verifyManualCode = () => {
+    const code = document.getElementById('manual-code-input').value.trim();
+    if(window.validateAndActivate(code)) {
+         document.getElementById('manual-code-input').value = "";
+    }
+};
+
+// Core Validation Logic (The Math)
+window.validateAndActivate = (code) => {
+    if (!code) return false;
+    code = code.toUpperCase();
+
+    // Check Used
+    const usedCodes = JSON.parse(localStorage.getItem('used_licenses') || '[]');
+    if (usedCodes.includes(code)) {
+        window.showFeedback("❌ Code Already Used!", true);
+        return false;
+    }
+
+    try {
+        const parts = code.split('-');
+        if (parts.length !== 3) throw new Error("Invalid Format");
+
+        const [type, randomPart, signature] = parts;
+        
+        // Verify Hash
+        const rawString = type + "-" + randomPart + "-" + SECRET_SALT;
+        const generatedHash = CryptoJS.MD5(rawString).toString().substring(0, 4).toUpperCase();
+
+        if (generatedHash !== signature) throw new Error("Fake Code");
+
+        // Duration
+        let duration = 0;
+        if (type === 'DAY') duration = 24 * 60 * 60 * 1000;
+        else if (type === 'WEEK') duration = 7 * 24 * 60 * 60 * 1000;
+        else if (type === 'MNTH') duration = 30 * 24 * 60 * 60 * 1000;
+        else throw new Error("Unknown Plan");
+
+        // Save & Activate
+        const expiryTime = Date.now() + duration;
+        localStorage.setItem('_px_t', expiryTime.toString());
+        localStorage.setItem('my_active_code', code);
+        
+        usedCodes.push(code);
+        localStorage.setItem('used_licenses', JSON.stringify(usedCodes));
+
+        window.premiumExpiry = expiryTime;
+        window.closePremiumModal(); // Closes any premium modal
+        document.getElementById('store-modal').classList.remove('active'); // Closes store
+        
+        window.showFeedback(`✅ Success! ${type} Pass Unlocked.`);
+        setTimeout(() => location.reload(), 1500);
+        return true;
+
+    } catch (e) {
+        console.error(e);
+        window.showFeedback("❌ Invalid Key!", true);
+        return false;
+    }
+};
+
+// Auto-Unlock on Page Load (URL Params)
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment_status') === 'success') {
+        const auth = urlParams.get('auth');
+        const plan = urlParams.get('plan'); // e.g. 'DAY'
+        
+        if (auth === MY_SECRET_AUTH && plan) {
+            // Generate valid code on the fly
+            const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const signature = CryptoJS.MD5(plan + "-" + randomPart + "-" + SECRET_SALT).toString().substring(0, 4).toUpperCase();
+            const newCode = `${plan}-${randomPart}-${signature}`;
+            
+            // Activate it
+            if(window.validateAndActivate(newCode)) {
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                // Show to user
+                setTimeout(() => {
+                    window.openStore();
+                    window.showFeedback("Payment Verified! Pass Activated.");
+                }, 1000);
+            }
+        }
+    }
+});
+
+// Admin Tool (Run in Console to make keys)
+window.generateLicenses = (type, count = 1) => {
+    const validTypes = ['DAY', 'WEEK', 'MNTH'];
+    if (!validTypes.includes(type)) return console.error("Use: DAY, WEEK, MNTH");
+    
+    console.log(`--- ${count} KEYS FOR ${type} ---`);
+    for (let i = 0; i < count; i++) {
+        const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const sig = CryptoJS.MD5(type + "-" + rand + "-" + SECRET_SALT).toString().substring(0, 4).toUpperCase();
+        console.log(`${type}-${rand}-${sig}`);
+    }
+};
+
+// =====================================================
+// 🚀 MASTER GAME LAUNCHER (FIXED FOR ALL GAMES)
+// =====================================================
+
+// 1. GAME PREPARATION (Triggered by Card Click)
+window.prepareGame = (gameId) => {
+    console.log("Preparing Game:", gameId);
+
+    // Agar Single Player hai (Bina Internet), toh seedha start karo 'Him' ke sath
+    if (!window.state.isMultiplayer) {
+        window.launchGameDirectly(gameId, 'Him');
+        return;
+    }
+
+    // Agar Multiplayer hai
+    if (window.state.isHost) {
+        // Host ko Modal dikhao ki kaun start karega
+        // Hum global variable use kar rahe hain taaki modal ko pata ho konsi game hai
+        window.pendingGameId = gameId; 
+        document.getElementById('starter-modal').classList.add('active');
+    } else {
+        // Guest ko wait karao
+        window.showFeedback("Waiting for Host to start the game... ⏳");
+    }
+};
+
+// 2. CONFIRM START (Triggered by Modal Button)
+window.confirmGameStart = (starter) => {
+    document.getElementById('starter-modal').classList.remove('active');
+    
+    if (window.pendingGameId) {
+        // Host khud game start karega
+        window.launchGameDirectly(window.pendingGameId, starter);
+        
+        // Partner ko signal bhejega ki game start karo
+        sendStateUpdate('GAME_START_SYNC', { 
+            gameId: window.pendingGameId, 
+            starter: starter 
+        });
+        
+        window.pendingGameId = null; // Reset
+    }
+};
+
+// 3. LAUNCHER (The Engine - Moon Cycle Added Here)
+window.launchGameDirectly = (gameId, starter) => {
+    console.log("🚀 Launching:", gameId, "Starter:", starter);
+
+    // --- STATE RESET LOGIC ---
+    if (gameId === 'tod') {
+        window.state.todTurn = starter;
+        window.initTOD();
+    } 
+    else if (gameId === 'nhie') {
+        window.state.nhie.turn = starter;
+        window.initNHIE(); 
+    }
+    else if (gameId === 'memory') {
+        window.state.memory.turn = starter;
+        window.initMemory();
+    }
+    else if (gameId === 'monopoly') {
+        window.state.monopoly.turn = starter;
+        window.initMonopoly();
+    }
+    else if (gameId === 'cards') {
+        window.initCards();
+    }
+    else if (gameId === 'movies') {
+        window.initMovies();
+    }
+    else if (gameId === 'story') {
+        window.initStory();
+    }
+    else if (gameId === 'bomb') {
+        // Bomb game reset logic if needed
+        window.showScreen('bomb');
+    }
+    else if (gameId === 'risk') {
+        window.startRiskGame();
+    }
+    else if (gameId === 'distraction') {
+        window.initDistraction();
+    }
+    else if (gameId === 'sls') {
+        window.initSLSGame();
+    }
+    else if (gameId === 'pandora') {
+        window.initPandora();
+    }
+    else if (gameId === 'roulette') {
+        window.initRoulette();
+    }
+    else if (gameId === 'lip') {
+        window.initLipGame();
+    }
+    else if (gameId === 'blindfold') {
+        window.initBlindfold();
+    }
+    
+    // 👇 YEH HAI WO LINE JO MISSING THI 👇
+    else if (gameId === 'cycle') {
+        window.initCycleGame(); 
+    }
+    
+    // Screen dikhao
+    window.showScreen(gameId);
+};
 
     </script>
-<div id="partner-status" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black/80 border border-pink-500/50 text-white px-4 py-2 rounded-full text-xs font-bold shadow-[0_0_15px_rgba(236,72,153,0.3)] hidden z-50 flex items-center gap-2">
+<div id="partner-status" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-black/80 border border-pink-500/50 text-white px-4 py-2 rounded-full text-xs font-bold shadow-[0_0_15px_rgba(236,72,153,0.3)] hidden z-50 flex items-center gap-2">
     <span class="relative flex h-2 w-2">
       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
       <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>

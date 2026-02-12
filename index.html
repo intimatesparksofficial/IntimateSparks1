@@ -7468,9 +7468,9 @@ window.activateTrial = () => {
 window.openPayment = (plan) => {
     // ⚠️ REPLACE THESE LINKS WITH YOUR ACTUAL RAZORPAY PAGE LINKS
     let link = "";
-    if (plan === 'DAY') link = "https://rzp.io/l/https://rzp.io/rzp/lw9KHut2"; 
-    if (plan === 'WEEK') link = "https://rzp.io/l/https://rzp.io/rzp/d7YWGNd";
-    if (plan === 'MNTH') link = "https://rzp.io/l/https://rzp.io/rzp/0VgVliZ";
+    if (plan === 'DAY') link = "https://rzp.io/rzp/lw9KHut2"; 
+    if (plan === 'WEEK') link = "https://rzp.io/rzp/d7YWGNd";
+    if (plan === 'MNTH') link = "https://rzp.io/rzp/0VgVliZ";
 
     if(link) window.open(link, '_self'); 
     else alert("Payment links not set in code!");

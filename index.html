@@ -315,24 +315,35 @@
 </div>
 
     <!-- API KEY MODAL (Mobile-optimized width: max-w-sm) -->
-    <div id="api-key-modal" class="modal-overlay">
-        <div class="glass-panel p-6 sm:p-8 w-full max-w-sm text-center transform scale-95 transition-transform duration-300">
-            <div class="mb-4 sm:mb-6"><i data-lucide="key" class="w-10 h-10 text-yellow-400 mx-auto"></i></div>
-            <h3 class="text-xl sm:text-2xl font-bold fancy-font mb-2 text-yellow-300">Unlock AI Features</h3>
-            <p class="text-xs opacity-60 mb-4 sm:mb-6">This feature requires a free Gemini API Key. Your key is stored locally on this device.</p>
-            
-            <input type="text" id="api-input" placeholder="Enter Your Free Gemini API Key Here" class="w-full p-3 sm:p-4 rounded-xl input-glass font-bold text-center mb-4 tracking-tight text-sm">
-            
-            <button onclick="window.saveAPIKey()" class="btn-gradient w-full py-3 rounded-xl font-bold text-sm bg-yellow-600/80 hover:bg-yellow-700/90">SAVE KEY & CONTINUE</button>
-            
-            <div class="mt-4 text-[10px] opacity-70 text-left">
-                <p class="font-bold text-white/90 mb-1">How to get a key?</p>
-                <p>1. "Search 'Google AI Studio API Key and create one from there for free."</p>
-                <p>2. Enter the key above. The key is only used for story/movie generation.</p>
-            </div>
+    <div id="api-key-modal" class="modal-overlay z-[200]">
+    <div class="glass-panel p-6 sm:p-8 w-full max-w-sm text-center transform scale-95 transition-transform duration-300 relative">
+        
+        <button onclick="document.getElementById('api-key-modal').classList.remove('active')" class="absolute top-4 right-4 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
+            <i data-lucide="x" class="w-5 h-5 text-white/50 hover:text-white"></i>
+        </button>
+
+        <div class="mb-4 sm:mb-6 mt-2">
+            <i data-lucide="key" class="w-10 h-10 text-yellow-400 mx-auto"></i>
+        </div>
+        
+        <h3 class="text-xl sm:text-2xl font-bold fancy-font mb-2 text-yellow-300">Unlock AI Features</h3>
+        <p class="text-xs opacity-60 mb-4 sm:mb-6">Enter your free Gemini API Key to generate unlimited stories & movie picks. Key is saved on your device.</p>
+        
+        <input type="text" id="api-input" placeholder="Paste API Key Here" class="w-full p-3 sm:p-4 rounded-xl input-glass font-bold text-center mb-4 tracking-tight text-sm focus:border-yellow-500 transition-colors">
+        
+        <button onclick="window.saveAPIKey()" class="btn-gradient w-full py-3 rounded-xl font-bold text-sm bg-yellow-600/80 hover:bg-yellow-700/90 shadow-lg mb-3">
+            SAVE KEY & CONTINUE
+        </button>
+
+        <button onclick="document.getElementById('api-key-modal').classList.remove('active')" class="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-white/60 hover:text-white transition-all">
+            Cancel / Maybe Later
+        </button>
+        
+        <div class="mt-4 text-[10px] opacity-50 text-center border-t border-white/10 pt-3">
+            <p>Don't have a key? Search "Google AI Studio API Key" to get one for free.</p>
         </div>
     </div>
-
+</div>
     <!-- SECURITY MODAL (Mobile-optimized width: max-w-sm) -->
     <div id="password-modal" class="modal-overlay">
         <div class="glass-panel p-6 sm:p-8 w-full max-w-sm text-center transform scale-95 transition-transform duration-300" id="password-modal-content">

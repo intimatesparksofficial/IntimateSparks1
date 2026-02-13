@@ -425,7 +425,8 @@
         </div>
     </div>
     
-    <header id="main-header" class="w-full max-w-5xl flex justify-between items-center py-4 z-50 fixed top-0 px-4 backdrop-blur-sm bg-black/20 transition-all duration-300 opacity-0 pointer-events-none">
+    <header id="main-header" class="w-full max-w-5xl flex justify-between items-center py-4 z-150 fixed top-0 px-4 backdrop-blur-sm bg-black/20 transition-all duration-300 opacity-0 pointer-events-none">
+
     <div class="flex items-center gap-2 cursor-pointer hover:opacity-80" onclick="window.showScreen('home')">
         <div class="p-2 bg-white/10 rounded-lg"><i data-lucide="layout-grid" class="w-5 h-5 text-white"></i></div>
         <span class="font-bold tracking-wider hidden md:block">HOME</span>
@@ -441,6 +442,12 @@
         <button onclick="window.showScreen('setup')" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors"><i data-lucide="settings" class="w-5 h-5 text-white"></i></button>
     </div>
 </header>
+
+<button onclick="window.openPlaybook()" class="bg-white/10 hover:bg-white/20 border border-white/20 p-2 rounded-full transition-colors relative group">
+        <i data-lucide="help-circle" class="w-5 h-5 text-indigo-300"></i>
+        <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] bg-black text-indigo-300 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Guide</span>
+    </button>
+
 
     <div id="music-panel" class="glass-panel p-4">
         <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
@@ -7687,6 +7694,31 @@ window.launchGameDirectly = (gameId, starter) => {
     window.showScreen(gameId);
 };
 
+// --- PLAYBOOK LOGIC ---
+window.openPlaybook = () => {
+    document.getElementById('playbook-modal').classList.add('active');
+    if(window.lucide) lucide.createIcons(); // Icons refresh
+};
+
+window.toggleGuide = (id) => {
+    const el = document.getElementById(id);
+    const isHidden = el.classList.contains('hidden');
+    
+    // Sab band karo pehle (Accordion effect)
+    document.querySelectorAll('[id^="guide-"]').forEach(d => d.classList.add('hidden'));
+    
+    // Agar band tha toh kholo
+    if (isHidden) {
+        el.classList.remove('hidden');
+        // Icon rotate logic (Optional visual flair)
+        const btn = el.previousElementSibling;
+        const icon = btn.querySelector('.lucide-chevron-down');
+        // Reset all icons
+        document.querySelectorAll('.lucide-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
+        if(icon) icon.style.transform = 'rotate(180deg)';
+    }
+};
+
     </script>
 <div id="partner-status" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-black/80 border border-pink-500/50 text-white px-4 py-2 rounded-full text-xs font-bold shadow-[0_0_15px_rgba(236,72,153,0.3)] hidden z-50 flex items-center gap-2">
     <span class="relative flex h-2 w-2">
@@ -7753,6 +7785,131 @@ window.launchGameDirectly = (gameId, starter) => {
     <button onclick="copyAdminCode()" class="bg-white text-black p-3 rounded-xl hover:bg-zinc-200 transition-all">
         <i data-lucide="copy" class="w-5 h-5"></i>
     </button>
+</div>
+
+<div id="playbook-modal" class="modal-overlay z-[200]">
+    <div class="glass-panel p-6 w-full max-w-lg h-[85vh] flex flex-col relative">
+        
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+        
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+            <div>
+                <h2 class="text-2xl font-black fancy-font text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">THE PLEASURE MANUAL 📖</h2>
+                <p class="text-xs opacity-60">Master the art of playing... together. 😉</p>
+            </div>
+            <button onclick="document.getElementById('playbook-modal').classList.remove('active')" class="p-2 hover:bg-white/10 rounded-full"><i data-lucide="x" class="w-6 h-6 text-white/50"></i></button>
+        </div>
+
+        <div class="overflow-y-auto custom-scroll pr-2 space-y-3 flex-grow">
+
+            <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <button onclick="window.toggleGuide('guide-mp')" class="w-full p-4 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <span class="font-bold text-sm text-green-300 flex items-center gap-2"><i data-lucide="wifi" class="w-4 h-4"></i> Multiplayer Setup 📡</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-50"></i>
+                </button>
+                <div id="guide-mp" class="hidden p-4 text-xs text-white/80 leading-relaxed border-t border-white/5 bg-black/20">
+                    <p class="mb-2"><strong>Goal:</strong> Connect two phones instantly (Long Distance or Same Room).</p>
+                    <ol class="list-decimal pl-4 space-y-2 opacity-90">
+                        <li>Both open the app. Click the <strong>Users Icon</strong> (Top Right).</li>
+                        <li><strong>Host (Dominant?):</strong> Click 'HOST GAME'. Send the code to your partner.</li>
+                        <li><strong>Joiner (Submissive?):</strong> Click 'JOIN GAME'. Paste the code.</li>
+                        <li>Wait for the "Connected" ping. Now, whatever the Host clicks, the Partner sees. Magic. ✨</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <button onclick="window.toggleGuide('guide-moon')" class="w-full p-4 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <span class="font-bold text-sm text-pink-300 flex items-center gap-2"><i data-lucide="moon" class="w-4 h-4"></i> Moon Cycle Mode 🌸</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-50"></i>
+                </button>
+                <div id="guide-moon" class="hidden p-4 text-xs text-white/80 leading-relaxed border-t border-white/5 bg-black/20">
+                    <p class="mb-2"><strong>The Green Flag Feature. 💚</strong></p>
+                    <p>When she's having <em>those days</em>, open this. She selects her mood (Pain, Emotional, Hungry). You get a specific <strong>Care Task</strong> (Massage, Food, Cuddles). No sex, just pure love and pampering. Be the boyfriend she brags about.</p>
+                </div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <button onclick="window.toggleGuide('guide-classics')" class="w-full p-4 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <span class="font-bold text-sm text-blue-300 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4"></i> The Classics (Foreplay) 🌶️</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-50"></i>
+                </button>
+                <div id="guide-classics" class="hidden p-4 text-xs text-white/80 leading-relaxed border-t border-white/5 bg-black/20">
+                    <ul class="list-disc pl-4 space-y-2">
+                        <li><strong>Truth or Dare:</strong> Truths that make you blush 😳, Dares that make you naked. 👙</li>
+                        <li><strong>Never Have I Ever:</strong> If you've done it, put a finger down. Loser gets punished. 😈</li>
+                        <li><strong>Mystery Cards:</strong> Roll the dice to flip a card. 50+ Kamasutra-style positions & acts. Fate decides your angle tonight. 🎲</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <button onclick="window.toggleGuide('guide-fun')" class="w-full p-4 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <span class="font-bold text-sm text-teal-300 flex items-center gap-2"><i data-lucide="gamepad-2" class="w-4 h-4"></i> Fun & Bonding 🥂</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-50"></i>
+                </button>
+                <div id="guide-fun" class="hidden p-4 text-xs text-white/80 leading-relaxed border-t border-white/5 bg-black/20">
+                    <ul class="list-disc pl-4 space-y-2">
+                        <li><strong>AI Movie Date:</strong> Stop fighting over what to watch. AI picks the perfect romantic (or spicy) movie for you. 🍿</li>
+                        <li><strong>Coupons:</strong> Win daily coupons like "Yes Day" or "Full Massage". Redeem them in real life. 🎟️</li>
+                        <li><strong>Memory Match:</strong> Find the matching pair. If you match, you win a specific pleasure reward immediately. 🧠💋</li>
+                        <li><strong>Scratch Adventure:</strong> Rub the screen to reveal a hidden position or dare. What lies beneath? 🙈</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <button onclick="window.toggleGuide('guide-heat')" class="w-full p-4 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <span class="font-bold text-sm text-orange-400 flex items-center gap-2"><i data-lucide="flame" class="w-4 h-4"></i> Getting Hot 🔥</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-50"></i>
+                </button>
+                <div id="guide-heat" class="hidden p-4 text-xs text-white/80 leading-relaxed border-t border-white/5 bg-black/20">
+                    <ul class="list-disc pl-4 space-y-2">
+                        <li><strong>Monopoly:</strong> Roll & Move. Every tile has a consequence (Kiss, Strip, Truth). Complete a round to own your partner. 🎩</li>
+                        <li><strong>Spice & Dice:</strong> Spin two wheels. Action (Lick) + Body Part (Neck). Do exactly what it says. 🎰</li>
+                        <li><strong>Squeeze Lick Suck:</strong> A slot machine for your mouth. Will you get a "Gentle Kiss" or a "Deep Throat"? 🍭</li>
+                        <li><strong>AI Fantasies:</strong> Generate a hot roleplay script (Doctor, Boss, Strangers). Act it out. 🎭</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <button onclick="window.toggleGuide('guide-risk')" class="w-full p-4 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <span class="font-bold text-sm text-red-500 flex items-center gap-2"><i data-lucide="siren" class="w-4 h-4"></i> High Stakes (Risk) ⚠️</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-50"></i>
+                </button>
+                <div id="guide-risk" class="hidden p-4 text-xs text-white/80 leading-relaxed border-t border-white/5 bg-black/20">
+                    <ul class="list-disc pl-4 space-y-2">
+                        <li><strong>Risk It All:</strong> Press the button to increase 'Heat'. The higher you go, the sexier the reward. But if you get <strong>BUSTED</strong>, you lose clothes instantly. 👙</li>
+                        <li><strong>Lust Bomb:</strong> A timer is ticking (30-60s). Complete the task ("Kiss Neck") and pass the phone. If it explodes on YOU... punishment time. 💣</li>
+                        <li><strong>Pandora's Box:</strong> 3 Devils 😈 (Punishments), 3 Angels 😇 (Rewards). Open 3 boxes to seal your fate. Will you get a massage or handcuffs? 📦</li>
+                        <li><strong>Temptation (Endurance):</strong> One person taps the button to survive. The other MUST distract them (touching, kissing). If tapping stops... Game Over. 🥵</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+                <button onclick="window.toggleGuide('guide-sense')" class="w-full p-4 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-all text-left">
+                    <span class="font-bold text-sm text-indigo-300 flex items-center gap-2"><i data-lucide="eye-off" class="w-4 h-4"></i> Sensory Deprivation 🫣</span>
+                    <i data-lucide="chevron-down" class="w-4 h-4 opacity-50"></i>
+                </button>
+                <div id="guide-sense" class="hidden p-4 text-xs text-white/80 leading-relaxed border-t border-white/5 bg-black/20">
+                    <ul class="list-disc pl-4 space-y-2">
+                        <li><strong>Sensory Blindfold:</strong> One wears a mask. The other uses tools (ice, feather, lips). Guess what it is. Wrong guess = Punishment. 🧊</li>
+                        <li><strong>Lip Lust:</strong> Wear headphones with loud music. Read your partner's lips as they whisper dirty things. Guess wrong? Pay the price. 🎧</li>
+                        <li><strong>Russian Roulette:</strong> 6 Chambers. 1 Bullet. Pull the trigger. Safe = Pleasure. Bang = Fatal Punishment. Are you lucky? 🔫</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-center mt-4">
+                <h4 class="text-amber-400 font-bold text-sm mb-1 uppercase tracking-widest">Why Unlock Premium? 👑</h4>
+                <p class="text-xs text-amber-200/70 mb-2">Because free things are good, but premium things are <em>wild</em>.</p>
+                <p class="text-[10px] opacity-60">Unlock 18+ Modes, Unlimited Time, Moon Cycle Access, and No Limits. Support the spark.</p>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 </body>

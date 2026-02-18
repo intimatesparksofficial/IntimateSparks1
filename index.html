@@ -7887,25 +7887,29 @@ window.toggleGuide = (id) => {
         if(icon) icon.style.transform = 'rotate(180deg)';
     }
 
-    // --- SPECIAL PROMO CODE LOGIC (AAJ KE LIYE) ---
+    // --- 24-HOUR DURATION LOGIC (STRICT 24H FROM ACTIVATION) ---
 window.addEventListener('load', () => {
     const originalSubmit = window.submitPremiumCode;
     
-    // Hum purane function ko override kar rahe hain bina usse delete kiye
     window.submitPremiumCode = () => {
         const val = document.getElementById('modal-input').value.trim().toUpperCase();
         const today = new Date();
-        // Month 1 = February
-        const isFeb18 = today.getFullYear() === 2026 && today.getMonth() === 1 && today.getDate() === 18;
+        const dateStr = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+        
+        // Allow activation ONLY on 18th Feb or 19th Feb (Back-up window)
+        const canActivate = (today.getFullYear() === 2026 && today.getMonth() === 1 && (today.getDate() === 18 || today.getDate() === 19));
 
-        // AAJ KA MAGIC CODE
         if (val === "ULTIMATE24") {
-            if (isFeb18) {
+            if (canActivate) {
+                // Calculation: Current Time + 24 Hours in milliseconds
                 const expiryTime = Date.now() + (24 * 60 * 60 * 1000); 
+                
                 localStorage.setItem('_px_t', expiryTime.toString());
                 window.premiumExpiry = expiryTime;
+                
                 window.closePremiumModal();
-                window.showFeedback("VIP ACCESS GRANTED! 🫦 (Valid for 24 Hours)");
+                window.showFeedback("VIP ACCESS ACTIVATED! 🫦 (Valid for 24 Hours)");
+                
                 setTimeout(() => location.reload(), 1000);
                 return;
             } else {
@@ -7914,11 +7918,10 @@ window.addEventListener('load', () => {
             }
         }
 
-        // Agar "ULTIMATE24" nahi hai, toh purana SID10/SID24 wala logic chalega
+        // Agar "ULTIMATE24" nahi hai, toh default logic chalne do
         originalSubmit();
     };
 });
-};
 
     </script>
 <div id="partner-status" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-black/80 border border-pink-500/50 text-white px-4 py-2 rounded-full text-xs font-bold shadow-[0_0_15px_rgba(236,72,153,0.3)] hidden z-50 flex items-center gap-2">

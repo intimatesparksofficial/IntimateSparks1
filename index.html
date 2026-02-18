@@ -7886,6 +7886,38 @@ window.toggleGuide = (id) => {
         document.querySelectorAll('.lucide-chevron-down').forEach(i => i.style.transform = 'rotate(0deg)');
         if(icon) icon.style.transform = 'rotate(180deg)';
     }
+
+    // --- SPECIAL PROMO CODE LOGIC (AAJ KE LIYE) ---
+window.addEventListener('load', () => {
+    const originalSubmit = window.submitPremiumCode;
+    
+    // Hum purane function ko override kar rahe hain bina usse delete kiye
+    window.submitPremiumCode = () => {
+        const val = document.getElementById('modal-input').value.trim().toUpperCase();
+        const today = new Date();
+        // Month 1 = February
+        const isFeb18 = today.getFullYear() === 2026 && today.getMonth() === 1 && today.getDate() === 18;
+
+        // AAJ KA MAGIC CODE
+        if (val === "ULTIMATE24") {
+            if (isFeb18) {
+                const expiryTime = Date.now() + (24 * 60 * 60 * 1000); 
+                localStorage.setItem('_px_t', expiryTime.toString());
+                window.premiumExpiry = expiryTime;
+                window.closePremiumModal();
+                window.showFeedback("VIP ACCESS GRANTED! 🫦 (Valid for 24 Hours)");
+                setTimeout(() => location.reload(), 1000);
+                return;
+            } else {
+                window.showFeedback("This promo code has expired! 💀", true);
+                return;
+            }
+        }
+
+        // Agar "ULTIMATE24" nahi hai, toh purana SID10/SID24 wala logic chalega
+        originalSubmit();
+    };
+});
 };
 
     </script>

@@ -301,7 +301,7 @@
         <span class="close-x-btn" onclick="window.closePremiumPopup()">&times;</span>
         
         <h2 class="text-2xl font-bold text-[#ff0055] mb-4">Hey Gorgeous! 🫦</h2>
-        <p class="text-sm mb-6 leading-relaxed">Why settle for basic when you can have it all? ✨ We've unlocked <b>2 PREMIUM TRIALS</b> just for you tonight! 🥵</p>
+        <p class="text-sm mb-6 leading-relaxed">Why settle for basic when you can have it all? ✨ We've unlocked <b>1 FREE PREMIUM TRIALS</b> just for you tonight! 🥵</p>
         
         <div class="instruction-box-flirty">
             Access them now in the <b>Crown 👑</b> section. Pick your poison and let the sparks fly! 😉
@@ -329,9 +329,9 @@
             <div id="trial-card" class="p-4 rounded-xl border border-blue-500/30 bg-blue-500/10 text-left relative overflow-hidden">
                 <div class="absolute top-0 right-0 bg-blue-500 text-white text-[9px] font-bold px-2 py-1 rounded-bl-lg">FREE</div>
                 <h3 class="text-lg font-bold text-blue-300">10 Min Trial ⏱️</h3>
-                <p class="text-xs opacity-70 mb-3">Test all Premium Games (Monopoly, Risk, etc). Max 2 uses.</p>
+                <p class="text-xs opacity-70 mb-3">Test all Premium Games (Monopoly, Risk, etc). Max 1 uses.</p>
                 <div class="flex justify-between items-center">
-                    <span class="text-xs font-mono text-blue-200" id="trial-status">Uses Left: 2/2</span>
+                    <span class="text-xs font-mono text-blue-200" id="trial-status">Uses Left: 1/1</span>
                     <button onclick="window.activateTrial()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-bold transition-all">START TRIAL</button>
                 </div>
             </div>
@@ -7604,7 +7604,7 @@ window.openStore = () => {
     
     // Check Trial Status
     const uses = parseInt(localStorage.getItem('trial_uses') || '0');
-    const maxUses = 2;
+    const maxUses = 1;
     document.getElementById('trial-status').textContent = `Uses Left: ${maxUses - uses}/${maxUses}`;
     
     if (uses >= maxUses) {
@@ -7637,7 +7637,7 @@ window.updateStoreUI = () => {
 
 window.activateTrial = () => {
     const uses = parseInt(localStorage.getItem('trial_uses') || '0');
-    if (uses >= 2) return;
+    if (uses >= 1) return;
 
     localStorage.setItem('trial_uses', uses + 1);
     const expiryTime = Date.now() + (10 * 60 * 1000); // 10 Mins
@@ -7739,7 +7739,7 @@ window.initTrialSystem = () => {
     const uses = parseInt(localStorage.getItem('trial_uses') || '0');
     const homeBanner = document.getElementById('home-trial-banner');
     if(homeBanner) {
-        if (uses < 2 && (!isTrial || expiry < now)) {
+        if (uses < 1 && (!isTrial || expiry < now)) {
             homeBanner.classList.remove('hidden'); // Trial bacha hai toh dikhao
         } else {
             homeBanner.classList.add('hidden'); // Activate ho gaya toh hata do

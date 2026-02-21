@@ -617,6 +617,15 @@
                 <h2 class="text-3xl md:text-4xl font-bold fancy-font mb-2">Choose Adventure</h2>
                 <p class="text-sm opacity-60" id="welcome-msg">Welcome</p>
             </div>
+            <div id="home-trial-banner" class="w-full max-w-4xl px-4 mb-6 fade-in-up hidden">
+            <button onclick="window.openStore()" class="w-full bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 text-black py-4 px-6 rounded-2xl shadow-[0_0_20px_rgba(251,191,36,0.4)] animate-pulse flex items-center justify-between hover:scale-[1.02] transition-transform">
+                <span class="text-left leading-tight">
+                    <span class="block text-lg font-black tracking-wide">🎁 FREE TRIAL PASS AVAILABLE</span>
+                    <span class="block text-[11px] font-bold opacity-80 uppercase tracking-widest mt-1">Click to Activate & Unlock Everything</span>
+                </span>
+                <i data-lucide="chevron-right" class="w-8 h-8"></i>
+            </button>
+        </div>
             <!-- Home Grid: Changed to sm:grid-cols-2 for better mobile density -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl fade-in-up" style="animation-delay: 0.1s">
 
@@ -7632,11 +7641,18 @@ window.activateTrial = () => {
 
     localStorage.setItem('trial_uses', uses + 1);
     const expiryTime = Date.now() + (10 * 60 * 1000); // 10 Mins
-    localStorage.setItem('_px_t', expiryTime);
+    localStorage.setItem('_px_t', expiryTime.toString());
+    
+    // Naye flags set kar rahe hain timer chalane ke liye
+    localStorage.setItem('_is_trial', 'true'); 
+    localStorage.removeItem('_trial_reminder_shown'); 
+    
     window.premiumExpiry = expiryTime;
 
-    window.showFeedback("🚀 10-Min Trial Activated!");
+    window.showFeedback("🚀 10-Min Trial Activated! Enjoy all games.");
     document.getElementById('store-modal').classList.remove('active');
+    
+    // Page refresh hoga aur timer chal jayega
     setTimeout(() => location.reload(), 1000);
 };
 
@@ -7714,6 +7730,70 @@ window.validateAndActivate = (code) => {
     }
 };
 
+window.initTrialSystem = () => {
+    const isTrial = localStorage.getItem('_is_trial') === 'true';
+    const expiry = parseInt(localStorage.getItem('_px_t') || '0');
+    const now = Date.now();
+    
+    // Home Page Banner kab dikhana hai
+    const uses = parseInt(localStorage.getItem('trial_uses') || '0');
+    const homeBanner = document.getElementById('home-trial-banner');
+    if(homeBanner) {
+        if (uses < 2 && (!isTrial || expiry < now)) {
+            homeBanner.classList.remove('hidden'); // Trial bacha hai toh dikhao
+        } else {
+            homeBanner.classList.add('hidden'); // Activate ho gaya toh hata do
+        }
+    }
+
+    // Agar trial chal raha hai
+    if (isTrial && expiry > now) {
+        const timerBar = document.getElementById('free-timer-bar');
+        const timerDisplay = document.getElementById('timer-display');
+        if(timerBar) timerBar.classList.remove('hidden');
+        
+        let reminderShown = localStorage.getItem('_trial_reminder_shown') === 'true';
+
+        const trialInterval = setInterval(() => {
+            const timeLeftMs = parseInt(localStorage.getItem('_px_t') || '0') - Date.now();
+            
+            if (timeLeftMs <= 0) {
+                // Time khatam
+                clearInterval(trialInterval);
+                localStorage.removeItem('_is_trial');
+                localStorage.removeItem('_trial_reminder_shown');
+                alert("⏳ Time's Up! Premium games are now locked.");
+                location.reload(); // Refresh to lock everything
+            } else {
+                // Time bacha hai, display update karo
+                const mins = Math.floor(timeLeftMs / 60000);
+                const secs = Math.floor((timeLeftMs % 60000) / 1000);
+                if(timerDisplay) {
+                    timerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                }
+                
+                // EXACT 2 MINUTE REMINDER (120,000 milliseconds)
+                if (timeLeftMs <= 120000 && !reminderShown) {
+                    reminderShown = true;
+                    localStorage.setItem('_trial_reminder_shown', 'true');
+                    document.getElementById('trial-reminder-modal').classList.remove('hidden');
+                    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+                }
+            }
+        }, 1000);
+    } else if (isTrial && expiry <= now) {
+        // Agar pehle trial chal raha tha par phone band tha, toh clear kar do
+        localStorage.removeItem('_is_trial');
+        localStorage.removeItem('_trial_reminder_shown');
+    }
+};
+
+// Asli kaam: Page load hote hi Trial check karna
+document.addEventListener('DOMContentLoaded', () => {
+    window.showScreen('setup'); 
+    if(window.lucide) lucide.createIcons();
+    window.initTrialSystem(); // Ye line timer chalu karegi
+});
 // Auto-Unlock on Page Load (URL Params)
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -7977,6 +8057,11 @@ window.addEventListener('load', () => {
 
         <div class="space-y-3">
             <button onclick="submitPremiumCode()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-2xl transition-transform active:scale-95 shadow-lg shadow-red-900/20">UNLOCK NOW</button>
+            
+            <button onclick="window.closePremiumModal(); window.openStore();" class="w-full bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black py-4 rounded-2xl transition-transform active:scale-95 shadow-lg shadow-yellow-500/20 mt-2 mb-2">
+                👑 BUY PREMIUM FOR JUST ₹29
+            </button>
+            
             <button onclick="closePremiumModal()" class="w-full text-zinc-500 text-xs font-medium py-2 hover:text-white transition-colors">MAYBE LATER</button>
         </div>
     </div>
@@ -8113,6 +8198,26 @@ window.addEventListener('load', () => {
                 <p class="text-[10px] opacity-60">Unlock 18+ Modes, Unlimited Time, Moon Cycle Access, and No Limits. Support the spark.</p>
             </div>
 
+        </div>
+    </div>
+</div>
+
+    <div id="free-timer-bar" class="fixed top-0 left-0 w-full bg-red-600 text-white text-center py-2 z-[9999] font-bold text-sm shadow-lg hidden">
+    🎁 FREE PREMIUM ACCESS: <span id="timer-display">10:00</span> LEFT
+</div>
+
+<div id="trial-reminder-modal" class="fixed inset-0 z-[10000] hidden flex items-center justify-center bg-black/95 backdrop-blur-md">
+    <div class="bg-zinc-950 border-2 border-yellow-500/50 p-8 rounded-[2rem] w-[90%] max-w-sm text-center shadow-[0_0_50px_rgba(234,179,8,0.3)]">
+        <div class="text-5xl mb-4 animate-bounce">⏳</div>
+        <h2 class="text-2xl font-black text-yellow-400 mb-2 uppercase">Only 2 Minutes Left!</h2>
+        <p class="text-zinc-400 text-sm mb-6">Your free premium access is about to expire. Keep the sparks flying!</p>
+        <div class="space-y-3">
+            <button onclick="document.getElementById('trial-reminder-modal').classList.add('hidden'); window.openStore();" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-black py-4 rounded-xl shadow-lg transition-transform active:scale-95">
+                👑 BUY PREMIUM ONLY FOR ₹29
+            </button>
+            <button onclick="document.getElementById('trial-reminder-modal').classList.add('hidden')" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl transition-colors">
+                SKIP FOR NOW
+            </button>
         </div>
     </div>
 </div>

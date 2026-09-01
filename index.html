@@ -289,6 +289,42 @@
         
         .memory-card.turn-locked { opacity: 0.7; cursor: not-allowed !important; }
 
+        #roles-list > div {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 95px;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+#roles-list > div:hover {
+    border-color: rgba(236, 72, 153, 0.6);
+    transform: translateY(-2px);
+}
+
+/* Yeh dark transparent gradient overlay image ke upar text ko clear dikhayega */
+#roles-list > div::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(15, 5, 10, 0.92) 45%, rgba(15, 5, 10, 0.3) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+#roles-list > div > div {
+    position: relative;
+    z-index: 2;
+    padding: 14px 16px;
+    background: transparent !important; /* Koi bhi extra white background block nahi aayega */
+}
             </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4">
@@ -3486,22 +3522,58 @@ function setupConnection(conn) {
             }
         };
 
-        const rolesData = [
-            "Boss & Secretary", "Neighbors", "Doctor & Patient", "Stranger at Bar", 
-            "Photographer & Model", "Thief & Homeowner", "Ex-Lovers", "Massage Therapist", 
-            "CEO & Intern", "Pilot & Flight Attendant", "Vampire & Human", "Roommates", 
-            "Strict Boss & Late Employee", "Nurse & Patient", "Plumber & Homeowner", 
-            "Maid/Butler & Owner", "Personal Trainer & Client", "Uber Driver & Passenger", 
-            "Hitchhiker & Driver", "High School Crush", "Police & Thief", "Arranged Marriage", 
-            "Professor & Student", "Landlord & Tenant", "Babysitter & Single Parent", 
-            "Best Friend's Partner", "Pizza Delivery", "Yoga Instructor", "Mechanic & Customer", 
-            "Hotel Staff & Guest", "Gym Crush", "Cinema Strangers", "Kidnapper & Hostage", 
-            "Rival Spies", "Bodyguard & Celebrity", "Soldier & Nurse", "King & Servant", 
-            "Ghost & Living", "Coworkers (Rivals)", "Interviewer & Candidate", "Librarian & Student", 
-            "Guest & Host", "Home Tutor & Parent", "Tattoo Artist", "Tailor & Customer", 
-            "Hairdresser & Client", "Park Meeting", "Train Journey", "Lifeguard & Swimmer", 
-            "Pirate & Captive"
-        ];
+        const rolesWithVisuals = [
+    { role: "Babysitter & Single Parent", hint: "When the kids are asleep, the adults come out to play.", img: "BABYSITTER.jpeg" },
+    { role: "Best Friend's Partner", hint: "A secret glance across the room when nobody else is watching.", img: "BEST FRIEND'S PARTNER.jpeg" },
+    { role: "Bodyguard & Celebrity", hint: "Escaping the paparazzi into a secure, locked hotel room.", img: "BODYGUARD AND CELEBRITY.jpeg" },
+    { role: "Boss & Secretary", hint: "Overtime work, closed office doors, and unspoken desires.", img: "BUSSINESS.jpeg" },
+    { role: "CEO & Intern", hint: "Late-night file reviews in a private executive suite.", img: "CEO AND INTERN.jpeg" },
+    { role: "Cinema Strangers", hint: "Sharing the last row of a dark movie theater.", img: "CINEMA STRANGERS.jpeg" },
+    { role: "Coworkers (Rivals)", hint: "Competing for the same promotion until the office empties out.", img: "COWORKERS.jpeg" },
+    { role: "Doctor & Patient", hint: "A private clinic checkup where professional boundaries blur.", img: "DOC.jpeg" },
+    { role: "Ex-Lovers", hint: "An unexpected reunion after years apart reawakens old flames.", img: "EX LOVERS.jpeg" },
+    { role: "Ghost & Living", hint: "A spirit haunting an old mansion who can still feel your touch.", img: "GHOST AND LIVING.jpeg" },
+    { role: "Guest & Host", hint: "Staying over at a friend's place on the couch.", img: "GUEST AND HOST.jpeg" },
+    { role: "Gym Crush", hint: "Heavy breathing and a private post-workout session.", img: "GYM CRUSH.jpeg" },
+    { role: "Personal Trainer & Client", hint: "Private gym session focusing entirely on each other.", img: "GYM TRAINER.jpeg" },
+    { role: "Hairdresser & Client", hint: "Washing hair at the salon sink with gentle touches.", img: "HAIRDRESSER AND CLIENT.jpeg" },
+    { role: "Hitchhiker & Driver", hint: "Picking up a stranger on a lonely desert highway.", img: "HICKER AND DRIVER.jpeg" },
+    { role: "High School Crush", hint: "Meeting under the bleachers after the big game.", img: "HIGH SCHOOL CRUSH.jpeg" },
+    { role: "Home Tutor & Parent", hint: "Parent-teacher meeting after hours.", img: "HOME TUTOR AND PARENT.jpeg" },
+    { role: "Hotel Staff & Guest", hint: "Room service delivery at 2 AM with a special request.", img: "HOTEL STAFF AND GUEST.jpeg" },
+    { role: "Interviewer & Candidate", hint: "A closed-door job interview that turns personal.", img: "INTERVIEWER AND CANDIDATE.jpeg" },
+    { role: "Kidnapper & Hostage", hint: "A dangerous captor and a captive who starts enjoying it.", img: "KIDNAPPER AND HOSTAGE.jpeg" },
+    { role: "King & Servant", hint: "Midnight summons to the royal chambers.", img: "KING AND SERVANT.jpeg" },
+    { role: "Landlord & Tenant", hint: "The rent is due, but there are other ways to pay.", img: "LANDLORD AND TENANT.jpeg" },
+    { role: "Librarian & Student", hint: "Whispering in the stacks where silence is required.", img: "LIBRARIAN AND STUDENT.jpeg" },
+    { role: "Lifeguard & Swimmer", hint: "After-hours swim in a resort pool under the stars.", img: "LIFEGUARD AND SWIMMER.jpeg" },
+    { role: "Maid/Butler & Owner", hint: "Bound by duty, drawn by desire behind closed doors.", img: "MAID AND OWNER.jpeg" },
+    { role: "Mechanic & Customer", hint: "Checking under the hood while the garage is locked.", img: "MECHANIC AND CUSTOMER.jpeg" },
+    { role: "Massage Therapist", hint: "A professional session shifting into something personal.", img: "MESSAGE THERAPIST.jpeg" },
+    { role: "Neighbors", hint: "A borrowed cup of sugar leads to late-night secrets.", img: "NEIGHBOURS.jpeg" },
+    { role: "Arranged Marriage", hint: "Two strangers forced under one roof discovering each other.", img: "NEW MARRIED COUPLE.jpeg" },
+    { role: "Nurse & Patient", hint: "A private hospital room after midnight.", img: "NURSE AND PATIENT.jpeg" },
+    { role: "Park Meeting", hint: "Secretly meeting on a secluded park bench at night.", img: "PARK MEETING.jpeg" },
+    { role: "Photographer & Model", hint: "Studio flashes and tension behind the lens.", img: "PHOTGRAPHER.jpeg" },
+    { role: "Pilot & Flight Attendant", hint: "Locked cockpit doors 30,000 feet in the air.", img: "PILOT.jpeg" },
+    { role: "Pirate & Captive", hint: "A legendary captain and a captive in the ship's cabin.", img: "PIRATE AND CAPTIVE.jpeg" },
+    { role: "Pizza Delivery", hint: "Opening the door when wearing almost nothing.", img: "PIZZA DELIVERY GUY.jpeg" },
+    { role: "Plumber & Homeowner", hint: "A broken pipe leads to rising temperatures.", img: "PLUMBER.jpeg" },
+    { role: "Police & Thief", hint: "A high-stakes interrogation room with just the two of them.", img: "POLICE AND THIEF.jpeg" },
+    { role: "Professor & Student", hint: "After-hours tutoring in an empty campus library.", img: "PROFESSOR STUDNET.jpeg" },
+    { role: "Rival Spies", hint: "Targeting the same enemy at a masquerade ball.", img: "RIVAL SPIES.jpeg" },
+    { role: "Roommates", hint: "Sharing an apartment means sharing more than rent.", img: "ROOMMATES.jpeg" },
+    { role: "Soldier & Nurse", hint: "Treating a wound in a quiet medical tent.", img: "SOLDIER AND NURSE.jpeg" },
+    { role: "Stranger at Bar", hint: "Eye contact across a dimly lit lounge.", img: "STRANGER AT BAR.jpeg" },
+    { role: "Strict Boss & Late Employee", hint: "Being caught working late has unexpected rewards.", img: "STRICT BOSS.jpeg" },
+    { role: "Tailor & Customer", hint: "Taking precise measurements for a custom gown.", img: "TAILOR AND CUSTOMER.jpeg" },
+    { role: "Tattoo Artist", hint: "Inking a custom design behind closed studio doors.", img: "TATTO ARTIST.jpeg" },
+    { role: "Thief & Homeowner", hint: "A midnight break-in turns into a game of cat and mouse.", img: "THEIF.jpeg" },
+    { role: "Train Journey", hint: "Sharing a private sleeper compartment on a train.", img: "TRAIN JOURNEY.jpeg" },
+    { role: "Uber Driver & Passenger", hint: "A late-night ride through empty city streets.", img: "UBER DRIVER.jpeg" },
+    { role: "Vampire & Human", hint: "An immortal creature and a forbidden midnight encounter.", img: "VAMPIRE AND HUMAN.jpeg" },
+    { role: "Yoga Instructor", hint: "Private stretching session on the mat with close guidance.", img: "YOGA INSTRUCTOR.jpeg" }
+];
         
         // --- NEW: AI MOVIE PICKER DATA (UPDATED) ---
         const movieIndustries = [
@@ -3725,128 +3797,184 @@ function setupConnection(conn) {
             }
         };
 
-        window.initStory = () => {
-             
-            const list = document.getElementById('roles-list'); list.innerHTML = '';
-            rolesData.forEach(r => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-3 rounded-lg border border-white/10 hover:bg-white/10 transition-colors text-sm font-semibold flex justify-between group';
-                btn.innerHTML = `<span>${r}</span><i data-lucide="chevron-right" class="w-4 h-4 opacity-0 group-hover:opacity-100"></i>`;
-                btn.onclick = () => { window.state.story.role = r; window.storyNav(2); };
-                list.appendChild(btn);
-            });
-            if(window.lucide) lucide.createIcons(); 
-            window.storyNav(1);
-        };
-        window.storyNav = (step) => {
-            ['1','2','3'].forEach(s => document.getElementById(`story-step-${s}`).classList.add('hidden'));
-            document.getElementById(`story-step-${step}`).classList.remove('hidden');
-            if(step === 2 && !window.state.story.actor) window.setStoryActor('Him');
-        };
-        window.setStoryActor = (a) => {
-            window.state.story.actor = a;
-            document.querySelectorAll('.story-actor-btn').forEach(b => b.classList.remove('bg-white/20', 'border-white'));
-            const idx = a === 'Him' ? 0 : 1; document.querySelectorAll('.story-actor-btn')[idx].classList.add('bg-white/20', 'border-white');
-        };
+window.initStory = () => {
+    const list = document.getElementById('roles-list'); 
+    if (!list) return;
+    list.innerHTML = ''; 
+    
+    try {
+        rolesWithVisuals.forEach(r => {
+            const isObject = typeof r === 'object';
+            const roleName = isObject ? r.role : r;
+            const roleHint = isObject ? r.hint : "A secret fantasy waiting to be explored.";
+            
+            let roleImg = "";
+            if (isObject) {
+                roleImg = r.img || r.ROOMMATES || "default.jpg"; 
+            }
 
+            const btn = document.createElement('button');
+            
+            btn.className = 'relative w-full text-left rounded-xl border border-white/10 bg-[#15050d] hover:border-pink-500/50 hover:shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all overflow-hidden group min-h-[105px] flex mb-3';
+            
+            // Yahan properly backticks use hue hain bina kisi slash ke
+            btn.innerHTML = `
+                <div class="relative z-10 w-[60%] p-4 flex flex-col justify-center pointer-events-none">
+                    <h3 class="text-base md:text-lg font-bold text-white leading-tight mb-1 drop-shadow-md">${roleName}</h3>
+                    <p class="text-[11px] md:text-xs text-white/60 leading-snug drop-shadow-sm font-medium">${roleHint}</p>
+                </div>
+                
+                <div class="absolute top-0 right-0 w-[45%] h-full z-0 pointer-events-none">
+                    <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#15050d] to-transparent z-10"></div>
+                    <img src="${roleImg}" onerror="this.style.opacity='0'" class="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500" alt="">
+                </div>
+            `;
+            
+            btn.onclick = () => { 
+                window.state.story.role = roleName; 
+                window.storyNav(2); 
+            };
+            
+            list.appendChild(btn);
+        });
+        
+        if(window.lucide) lucide.createIcons(); 
+        window.storyNav(1);
+
+    } catch (err) {
+        console.error("Story Init Error:", err);
+        // Error message ke liye normal single quotes use kiye hain taaki koi string issue na aaye
+        list.innerHTML = '<p class="text-red-400 text-center text-sm p-4">Error loading fantasies. Please check console.</p>';
+    }
+};
+
+window.storyNav = (step) => {
+    ['1','2','3'].forEach(s => {
+        const stepEl = document.getElementById(`story-step-${s}`);
+        if(stepEl) stepEl.classList.add('hidden');
+    });
+    const targetStep = document.getElementById(`story-step-${step}`);
+    if(targetStep) targetStep.classList.remove('hidden');
+    if(step === 2 && !window.state.story.actor) window.setStoryActor('Him');
+};
+
+window.setStoryActor = (a) => {
+    window.state.story.actor = a;
+    document.querySelectorAll('.story-actor-btn').forEach(b => b.classList.remove('bg-white/20', 'border-white'));
+    const idx = a === 'Him' ? 0 : 1; 
+    const btns = document.querySelectorAll('.story-actor-btn');
+    if(btns[idx]) btns[idx].classList.add('bg-white/20', 'border-white');
+};
         // This function now checks for the API key first.
-        window.generateAIStory = async () => {
-             
-            // Set pending action
-            window.state.pendingAction = window.generateAIStory;
 
-            if (!window.state.geminiKey) {
+window.generateAIStory = async () => {
+    window.state.pendingAction = window.generateAIStory;
+
+    if (!window.state.geminiKey) {
+        window.openAPIKeyModal();
+        return;
+    }
+    
+    // UI Loading state
+    window.showScreen('story'); 
+    window.storyNav(3); 
+    document.getElementById('ai-loading').style.display = 'flex'; 
+    document.getElementById('story-content').innerHTML = ''; 
+    
+    const role = window.state.story.role;
+    document.getElementById('story-role-title').textContent = role;
+    const actor = window.state.story.actor; 
+    const target = actor === 'Him' ? 'Her' : 'Him';
+    const diff = window.state.story.diff;
+    const diffText = diff === 1 ? "Playful/Easy" : (diff === 2 ? "Hesitant/Hard" : "Forbidden/Extreme");
+    
+const prompt = `Write an intensely seductive, slow-burn adult roleplay story.
+
+    CRITICAL LANGUAGE RULE (70% Roman Hindi, 30% English):
+    • The ENTIRE story (both narration/actions AND dialogue) MUST be in Hinglish (Hindi written in English alphabets).
+    • Do NOT write the action/narration in pure English. 
+    • WRONG: He grabbed her waist and pulled her close. "Tum kya kar rahi ho?"
+    • RIGHT: Usne uski kamar ko kaskar pakda aur apne kareeb kheench liya. "Tum kya kar rahi ho? Are you crazy?"
+    • Mix natural English words like "feel", "control", "crazy", "damn", "hot", "tension" seamlessly into the Roman Hindi sentences.
+    • Speak like modern Indian adults. NO heavy poetic words (Avoid "jism", "sparsh", "sargoshi"). Use "body", "touch", "kareeb", "saans".
+
+    Goal & Tone:
+    • Focus heavily on physical tension, seductive actions, and steamy adult themes.
+    • Clearly describe the choreography: EXACTLY where the hands are moving (e.g., shirt ke andar haath daalna, neck pe kiss karna, baalon ko pakadna), physical reactions (heavy breathing, shivering).
+    • The progression should be extremely hot: hesitation -> intense eye contact -> pulling close -> whispering -> touching -> giving in.
+    • Format it like a detailed script where dialogues and physical touches intertwine naturally.
+
+    Dynamic Variables:
+    Roleplay Scenario: ${role}
+    Initiator: ${actor} (${actor === 'Him' ? 'Male' : 'Female'})
+    Target: ${target} (${target === 'Him' ? 'Male' : 'Female'})
+    Resistance Level: ${diffText}
+    
+    Length: 250–350 words.
+    Output: Only <p> HTML paragraphs. No headings.`;
+
+    const apiKey = window.state.geminiKey; 
+    // 🔥 YAHAN EXACT MODEL DAAL DIYA JO TERI LIST MEIN HAI 🔥
+    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey;
+
+    const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        safetySettings: [
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
+        ]
+    };
+
+    let text = null;
+    let exactError = "Unknown Error Occurred";
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+
+        if (data.error) {
+            exactError = data.error.message;
+            if (exactError.includes("API key not valid")) {
+                window.showFeedback("Error: Invalid API Key. Please re-enter your key.", true);
+                localStorage.removeItem('geminiApiKey');
+                window.state.geminiKey = null;
+                document.getElementById('ai-loading').style.display = 'none';
                 window.openAPIKeyModal();
                 return;
             }
-            
-            // Proceed to the loading screen
-            window.showScreen('story'); window.storyNav(3); 
-            document.getElementById('ai-loading').style.display = 'flex'; document.getElementById('story-content').innerHTML = ''; 
-            const role = window.state.story.role;
-            document.getElementById('story-role-title').textContent = role;
-            const actor = window.state.story.actor; const target = actor === 'Him' ? 'Her' : 'Him';
-            const diff = window.state.story.diff;
-            const diffText = diff === 1 ? "Playful/Easy" : (diff === 2 ? "Hesitant/Hard" : "Forbidden/Extreme");
-            
-            const prompt = `Write an extended, intense, seductive, dialogue-focused roleplay story in Hinglish.
-            
-            Goal:
-            • Story must start slowly, with a smooth buildup.
-            • Increase length through layered dialogues, reactions, pauses.
-            • No romance — only mutual physical tension and attraction.
-            • Full consent maintained throughout.
-            • Slow-burn progression: hesitation → tension → persuasion → agreement.
-            • Do NOT rush to acceptance; let the dialogue create a gradual shift.
-            • No explicit or graphic physical details — only implied sensuality.
-            • 80–90% of the story should be dialogue and close-up tension.
+        } 
+        else if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            text = data.candidates[0].content.parts[0].text;
+        } 
+        else if (data.candidates?.[0]?.finishReason === 'SAFETY') {
+            exactError = "Google AI Safety Filter blocked this. Try changing the role or resistance level.";
+        } 
+        else {
+            exactError = "Unexpected Response: " + JSON.stringify(data);
+        }
+    } catch (e) {
+        exactError = e.message;
+    }
 
-            Dynamic Variables:
-            Role: ${role}
-            Initiator: ${actor} (${actor === 'Him' ? 'Male' : 'Female'})
-            Target: ${target} (${target === 'Him' ? 'Male' : 'Female'})
-            Resistance Level: ${diffText}
+    document.getElementById('ai-loading').style.display = 'none';
+    
+    if (text) {
+        text = text.replace(/```html/g, '').replace(/```/g, '').trim();
+        window.state.currentAIStory = text;
+        document.getElementById('story-content').innerHTML = text;
+        window.state.pendingAction = null;
+    } else {
+         document.getElementById('story-content').innerHTML = '<p class="text-red-400 font-bold">API Error: ' + exactError + '</p>';
+    }
+};
 
-            Structure:
-            1. Slow Start — The Visit  
-            2. Gradual Pull-In — Invitation Inside  
-            3. Extended Push–Pull  
-            4. The Shift — Mutual Realization  
-            5. After Acceptance — Extended Tension  
-            
-            Length: 250–300+ words  
-            Tone: Slow, bold, seductive, highly dialogue-heavy, tension-driven.  
-            Output: Only <p> HTML paragraphs, no headings.`;
-
-            // Using the user-provided key
-            const apiKey = window.state.geminiKey; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-            };
-
-            // Implement simple retry logic with exponential backoff (max 3 retries)
-            let response, data, text;
-            for (let i = 0; i < 3; i++) {
-                try {
-                    response = await fetch(apiUrl, {
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    
-                    data = await response.json();
-
-                    if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        text = data.candidates[0].content.parts[0].text;
-                        break; // Success
-                    } else if (data.error && data.error.message.includes("API key not valid")) {
-                        window.showFeedback("Error: Invalid API Key. Please re-enter your key.", true);
-                        localStorage.removeItem('geminiApiKey');
-                        window.state.geminiKey = null;
-                        document.getElementById('ai-loading').style.display = 'none';
-                        window.openAPIKeyModal();
-                        return;
-                    }
-                } catch (e) {
-                    console.error(`Attempt ${i+1} failed:`, e);
-                    if (i < 2) {
-                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                    }
-                }
-            }
-            
-            if (text) {
-                text = text.replace(/```html/g, '').replace(/```/g, '').trim();
-                window.state.currentAIStory = text;
-                document.getElementById('story-content').innerHTML = text;
-                window.state.pendingAction = null;
-            } else {
-                 document.getElementById('story-content').innerHTML = `<p class='text-red-400'>Error: Failed to generate story. Please check your API key or try again later.</p>`;
-            }
-            document.getElementById('ai-loading').style.display = 'none';
-        };
 
         // Replaced: No longer saves to Firebase, gives user feedback instead.
         window.saveCurrentStory = async () => { 

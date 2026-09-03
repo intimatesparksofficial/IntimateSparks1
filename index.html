@@ -2450,9 +2450,46 @@ window.handleReceivedData = (data) => {
     }
 };
 
+// --- STABLE MULTIPLAYER P2P ENGINE ---
+window.hostGame = () => {
+    window.state.isHost = true;
+    window.state.myRole = document.getElementById('mp-player-gender').value;
+    window.showMultiplayerStep(4);
+    document.getElementById('mp-loading').classList.remove('hidden');
+    document.getElementById('mp-status-desc').textContent = "Generating room code...";
+    document.getElementById('mp-host-code-display').classList.add('hidden');
+    window.initPeer(true);
+};
+
+window.joinGame = () => {
+    const code = document.getElementById('mp-join-code').value.trim().toUpperCase();
+    if (!code) {
+        window.showFeedback("Room code daalo!", true);
+        return;
+    }
+    window.state.isHost = false;
+    window.state.myRole = document.getElementById('mp-player-gender').value;
+    window.showMultiplayerStep(4);
+    document.getElementById('mp-loading').classList.remove('hidden');
+    document.getElementById('mp-status-desc').textContent = "Connecting to partner...";
+    document.getElementById('mp-host-code-display').classList.add('hidden');
+    window.initPeer(false, code);
+};
+
 window.initPeer = (isHost, connectToId = null) => {
-    const peerConfig = { debug: 0 };
-    if (window.state.myPeer) window.state.myPeer.destroy();
+    const peerConfig = {
+        config: {
+            'iceServers': [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:global.stun.twilio.com:3478' }
+            ]
+        },
+        debug: 1
+    };
+
+    if (window.state.myPeer) {
+        window.state.myPeer.destroy();
+    }
 
     try {
         if (isHost) {
@@ -2462,37 +2499,76 @@ window.initPeer = (isHost, connectToId = null) => {
             window.state.myPeer = new Peer(undefined, peerConfig);
         }
     } catch (e) {
-        window.showFeedback("Connection failed.", true);
+        window.showFeedback("Connection failed to initialize.", true);
         return;
     }
+
+    // 15 Second Timeout protection
+    if (window.connectionTimeout) clearTimeout(window.connectionTimeout);
+    window.connectionTimeout = setTimeout(() => {
+        if (!window.state.isMultiplayer) {
+            document.getElementById('mp-status-desc').textContent = "Connection timed out! Retry karo.";
+            document.getElementById('mp-loading').classList.add('hidden');
+            window.showFeedback("Connection timed out. Dono devices ka internet check karo.", true);
+        }
+    }, 15000);
 
     window.state.myPeer.on('open', (id) => {
         window.state.peerId = id;
         document.getElementById('mp-peer-id').textContent = id;
+        
         if (isHost) {
+            document.getElementById('mp-loading').classList.add('hidden');
+            document.getElementById('mp-host-code-display').classList.remove('hidden');
+            document.getElementById('mp-status-desc').textContent = "Waiting for partner to enter code...";
+            
             window.state.myPeer.on('connection', (conn) => {
+                if (window.connectionTimeout) clearTimeout(window.connectionTimeout);
                 window.state.connection = conn;
                 setupConnection(conn);
             });
         } else if (connectToId) {
-            const conn = window.state.myPeer.connect(connectToId);
+            const conn = window.state.myPeer.connect(connectToId, { reliable: true });
             window.state.connection = conn;
             setupConnection(conn);
         }
+    });
+
+    window.state.myPeer.on('error', (err) => {
+        if (window.connectionTimeout) clearTimeout(window.connectionTimeout);
+        console.error("Peer error:", err);
+        document.getElementById('mp-loading').classList.add('hidden');
+        document.getElementById('mp-status-desc').textContent = "Connection error. Code re-check karo.";
+        window.showFeedback("Connection error! Room code galat hai ya expired ho gaya.", true);
     });
 };
 
 function setupConnection(conn) {
     conn.on('open', () => {
+        if (window.connectionTimeout) clearTimeout(window.connectionTimeout);
+        
         window.state.isMultiplayer = true;
         window.updateMultiplayerUI();
-        sendStateUpdate('INIT_NAMES', { partnerName: window.state.names[window.state.myRole] });
         
-        // YAHAN CHANGE HAI: 'window.' lagana zaroori hai
-        conn.on('data', (data) => window.handleReceivedData(data)); 
+        // Partner Info Card Setup
+        const myName = window.state.names[window.state.myRole] || "Player";
+        sendStateUpdate('INIT_NAMES', { partnerName: myName });
+
+        const hostDisplay = document.getElementById('mp-host-info');
+        const guestDisplay = document.getElementById('mp-guest-info');
+        if (hostDisplay && guestDisplay) {
+            hostDisplay.textContent = window.state.isHost ? `${myName} (You)` : "Partner";
+            guestDisplay.textContent = !window.state.isHost ? `${myName} (You)` : "Partner";
+        }
+
+        // Screen Step 5 pe le jao
+        if (window.showMultiplayerStep) {
+            window.showMultiplayerStep(5);
+        }
+
+        conn.on('data', (data) => window.handleReceivedData(data));
     });
 
-    // Ye brackets ab function ke andar hain (Pehle bahar the, isliye error tha)
     conn.on('close', () => {
         window.state.isMultiplayer = false;
         window.updateMultiplayerUI();
@@ -2500,12 +2576,14 @@ function setupConnection(conn) {
     });
 
     conn.on('error', (err) => {
-        console.error("Connection error:", err);
+        console.error("Data connection error:", err);
         window.state.isMultiplayer = false;
         window.updateMultiplayerUI();
-        window.showFeedback("Connection error with partner.", true);
+        window.showFeedback("Connection dropped with partner.", true);
     });
-}        // --- END MULTIPLAYER P2P LOGIC ---
+}
+// --- END MULTIPLAYER P2P LOGIC ---
+
 
         // --- SECURITY LOGIC (Unchanged) ---
         window.savePasswords = () => localStorage.setItem('vaultPasswords', JSON.stringify(window.state.passwords));
@@ -4020,30 +4098,32 @@ const prompt = `Write an intensely seductive, slow-burn adult roleplay story.
                 else { btn.classList.remove('opacity-50', 'cursor-not-allowed'); }
             });
         };
+window.todAction = (type) => {
+    // Check agar multiplayer mein doosre ki turn hai
+    if (window.state.isMultiplayer && window.state.todTurn !== window.state.myRole) {
+        window.showFeedback(`Wait! It is ${window.state.names[window.state.todTurn]}'s turn!`, true);
+        return;
+    }
 
-        window.todAction = (type) => {
-            if (window.state.isMultiplayer && window.state.todTurn !== window.state.myRole) {
-                window.showFeedback(`Wait! It is ${window.state.names[window.state.todTurn]}'s turn!`, true);
-                return;
-            }
+    const pool = type === 'Truth' ? todData.truths : todData.dares;
+    const item = pool[Math.floor(Math.random() * pool.length)];
+    
+    document.getElementById('tod-choice-btns').classList.add('hidden');
+    const res = document.getElementById('tod-result'); 
+    res.classList.remove('hidden'); 
+    res.classList.add('flex');
+    
+    document.getElementById('tod-type-badge').textContent = type; 
+    document.getElementById('tod-text').textContent = item.text;
+    
+    const nextBtn = document.querySelector('#tod-result button');
+    nextBtn.disabled = false; 
+    nextBtn.onclick = () => window.todNextTurn();
 
-            const pool = type === 'Truth' ? todData.truths : todData.dares;
-            const item = pool[Math.floor(Math.random() * pool.length)];
-            
-            document.getElementById('tod-choice-btns').classList.add('hidden');
-            const res = document.getElementById('tod-result'); 
-            res.classList.remove('hidden'); 
-            res.classList.add('flex');
-            
-            document.getElementById('tod-type-badge').textContent = type; 
-            document.getElementById('tod-text').textContent = item.text;
-            
-            const nextBtn = document.querySelector('#tod-result button');
-            nextBtn.disabled = false; 
-            nextBtn.onclick = () => window.todNextTurn();
+    // Partner ko action bhejo
+    sendStateUpdate('TOD_ACTION', { type: type, text: item.text });
+};
 
-            sendStateUpdate('TOD_ACTION', { type: type, text: item.text });
-        };
 
         window.todNextTurn = () => {
             const nextTurn = window.state.todTurn === 'Him' ? 'Her' : 'Him';
@@ -4354,27 +4434,30 @@ window.initNHIE = () => {
         };
 
         window.handleCardClick = (index) => {
-            const currentTurn = window.state.memory.turn;
-            
-            if (window.state.memory.isLocked || window.state.memory.cards[index].isFlipped || window.state.memory.cards[index].isMatched) return;
-            if (window.state.isMultiplayer && currentTurn !== window.state.myRole) {
-                window.showFeedback(`Wait for your turn, ${window.state.names[window.state.myRole]}!`, true);
-                return;
-            }
-            if (window.state.memory.flipped.length >= 2) return;
-            
-            window.state.memory.cards[index].isFlipped = true;
-            window.state.memory.flipped.push(index);
-            window.renderMemoryBoard(); 
+    const currentTurn = window.state.memory.turn;
+    
+    // Check turn lock
+    if (window.state.isMultiplayer && currentTurn !== window.state.myRole) {
+        window.showFeedback(`Wait for your turn, ${window.state.names[window.state.myRole]}!`, true);
+        return;
+    }
+    
+    if (window.state.memory.isLocked || window.state.memory.cards[index].isFlipped || window.state.memory.cards[index].isMatched) return;
+    if (window.state.memory.flipped.length >= 2) return;
+    
+    window.state.memory.cards[index].isFlipped = true;
+    window.state.memory.flipped.push(index);
+    window.renderMemoryBoard(); 
 
-            sendStateUpdate('MEMORY_FLIP', { index: index });
-            document.getElementById('memory-action-log').textContent = `Card flipped: ${window.state.memory.flipped.length} of 2.`;
+    // Partner ko card flip bhejdo
+    sendStateUpdate('MEMORY_FLIP', { index: index });
 
-            if (window.state.memory.flipped.length === 2) {
-                window.state.memory.isLocked = true; 
-                setTimeout(window.checkForMatch, 1000);
-            }
-        };
+    if (window.state.memory.flipped.length === 2) {
+        window.state.memory.isLocked = true; 
+        setTimeout(window.checkForMatch, 1000);
+    }
+};
+;
 
         window.checkForMatch = () => {
             const [idx1, idx2] = window.state.memory.flipped;
@@ -4621,14 +4704,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 1. BUTTON CLICK HANDLER
 window.spinSpiceDice = () => {
-    // Agar pehle se ghoom raha hai toh kuch mat karo
     if(window.isSpinning) return;
     
-    // Result pehle hi calculate kar lo
     const aIndex = Math.floor(Math.random() * diceActions.length);
     const bIndex = Math.floor(Math.random() * diceBodyParts.length);
 
-    // Partner ko bhejo: "Ye index aaya hai, tum bhi yahi dikhao"
+    // Multiplayer mein partner ko index bhejo
     if (window.state.isMultiplayer) {
         sendStateUpdate('SPICE_SPIN', { 
             actionIndex: aIndex, 
@@ -4636,9 +4717,9 @@ window.spinSpiceDice = () => {
         });
     }
 
-    // Khud ke screen par animation chalao
     window.performSpiceSpin(aIndex, bIndex);
 };
+
 
 // 2. ANIMATION HANDLER (Dono taraf same chalega)
 window.performSpiceSpin = (aIndex, bIndex) => {
@@ -8349,6 +8430,152 @@ window.addEventListener('load', () => {
         </div>
     </div>
 </div>
+
+<!-- ======================================================== -->
+<!-- 💬 IN-GAME FLOATING CHAT WIDGET (Multiplayer Only) -->
+<!-- ======================================================== -->
+
+<!-- Floating Chat Trigger Button (Corner mein floating icon) -->
+<button id="chat-toggle-btn" onclick="window.toggleFloatingChat()" class="hidden fixed bottom-6 right-6 z-[99999] w-14 h-14 rounded-full bg-gradient-to-br from-pink-600 to-rose-700 border-2 border-pink-400 text-white shadow-[0_0_20px_rgba(236,72,153,0.6)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+    <i data-lucide="message-circle" class="w-7 h-7"></i>
+    <!-- Unread Notification Badge -->
+    <span id="chat-badge" class="hidden absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-black animate-pulse"></span>
+</button>
+
+<!-- Partner Active Status (Header ya Top pe dikhane ke liye) -->
+<div id="partner-status" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-[9999] bg-black/70 backdrop-blur-md px-4 py-1.5 rounded-full border border-pink-500/30 text-center pointer-events-none">
+    <p id="partner-status-text" class="text-[11px] font-bold text-pink-300 tracking-wide">Partner: Connected & Ready</p>
+</div>
+
+<!-- Floating Chat Modal Window -->
+<div id="floating-chat-modal" class="hidden fixed bottom-24 right-6 z-[99999] w-[90vw] max-w-[340px] h-[400px] glass-panel flex flex-col overflow-hidden shadow-2xl border-2 border-pink-500/50 bg-[#12030a]/95 backdrop-blur-xl rounded-2xl animate-fade-in-up">
+    
+    <!-- Chat Header -->
+    <div class="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-pink-900/50 to-purple-900/50 border-b border-white/10">
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+            <h4 class="text-sm font-bold text-white fancy-font tracking-wider">Live Couple Chat 💬</h4>
+        </div>
+        <button onclick="window.toggleFloatingChat()" class="text-white/60 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <!-- Chat Messages Scroll Area -->
+    <div id="chat-messages-container" class="flex-grow overflow-y-auto custom-scroll p-3 space-y-3 flex flex-col text-left">
+        <div class="text-center my-2">
+            <span class="text-[9px] uppercase tracking-widest bg-white/5 text-white/40 px-3 py-1 rounded-full border border-white/5">End-to-End Secure Connection 🔒</span>
+        </div>
+    </div>
+
+    <!-- Quick Emoji / Reaction Bar -->
+    <div class="flex gap-1.5 px-3 py-1.5 bg-black/40 border-t border-white/5 overflow-x-auto custom-scroll">
+        <button onclick="window.sendQuickEmoji('🔥')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">🔥</button>
+        <button onclick="window.sendQuickEmoji('😈')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">😈</button>
+        <button onclick="window.sendQuickEmoji('🥵')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">🥵</button>
+        <button onclick="window.sendQuickEmoji('🫦')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">🫦</button>
+        <button onclick="window.sendQuickEmoji('💋')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">💋</button>
+        <button onclick="window.sendQuickEmoji('👀')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">👀</button>
+    </div>
+
+    <!-- Chat Input Form -->
+    <div class="p-3 bg-black/60 border-t border-white/10 flex gap-2">
+        <input type="text" id="chat-input-box" placeholder="Whisper something dirty..." class="flex-1 bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder-white/30 focus:border-pink-500 outline-none" onkeypress="window.handleChatKeyPress(event)">
+        <button onclick="window.sendChatMessage()" class="btn-gradient px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-600 to-rose-600 shadow-md">
+            <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    // --- CHAT WIDGET JAVASCRIPT CONTROLLER ---
+
+    // Toggle Chat Window Open/Close
+    window.toggleFloatingChat = () => {
+        const modal = document.getElementById('floating-chat-modal');
+        const badge = document.getElementById('chat-badge');
+        
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            badge.classList.add('hidden'); // Clear unread notification
+            document.getElementById('chat-input-box').focus();
+        } else {
+            modal.classList.add('hidden');
+        }
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // Send Message Trigger
+    window.sendChatMessage = () => {
+        const input = document.getElementById('chat-input-box');
+        const text = input.value.trim();
+        if (!text) return;
+
+        // Append my own message to UI
+        window.appendMessage(text, 'me');
+        input.value = '';
+
+        // Send via PeerJS Connection (Multiplayer data channel)
+        if (window.state && window.state.isMultiplayer && window.state.connection) {
+            try {
+                window.state.connection.send({
+                    type: 'CHAT_MSG',
+                    payload: { text: text }
+                });
+            } catch (e) {
+                console.error("Chat send error:", e);
+                window.showFeedback("Message failed to send. Check connection.", true);
+            }
+        } else {
+            window.showFeedback("You are not connected in Multiplayer mode!", true);
+        }
+    };
+
+    // Quick Emoji Click Handler
+    window.sendQuickEmoji = (emoji) => {
+        const input = document.getElementById('chat-input-box');
+        input.value += emoji;
+        input.focus();
+    };
+
+    // Enter Key Handler
+    window.handleChatKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            window.sendChatMessage();
+        }
+    };
+
+    // Append Message to Container UI
+    window.appendMessage = (text, sender) => {
+        const container = document.getElementById('chat-messages-container');
+        const msgEl = document.createElement('div');
+        
+        const isMe = sender === 'me';
+        msgEl.className = `flex flex-col max-w-[80%] ${isMe ? 'self-end items-end' : 'self-start items-start'} animate-fade-in-up`;
+        
+        msgEl.innerHTML = `
+            <div class="px-3 py-2 rounded-2xl text-xs leading-relaxed ${isMe ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-br-none shadow-md' : 'bg-white/10 border border-white/10 text-white/90 rounded-bl-none'}">
+                ${escapeHtml(text)}
+            </div>
+            <span class="text-[8px] opacity-40 mt-0.5 px-1">${isMe ? 'You' : 'Partner'}</span>
+        `;
+        
+        container.appendChild(msgEl);
+        container.scrollTop = container.scrollHeight; // Auto-scroll to bottom
+
+        // If chat modal is closed, show unread badge notification
+        const modal = document.getElementById('floating-chat-modal');
+        if (!isMe && modal.classList.contains('hidden')) {
+            document.getElementById('chat-badge').classList.remove('hidden');
+        }
+    };
+
+    // XSS Safety helper
+    function escapeHtml(string) {
+        return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+</script>
+
 
 </body>
 </html>

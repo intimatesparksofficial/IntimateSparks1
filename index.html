@@ -2502,6 +2502,10 @@ case 'MEMORY_SHUFFLE':
     document.getElementById('memory-action-log').textContent = `Chain break! Cards Shuffled! Turn: ${window.state.names[payload.turn]}.`;
     break;
 
+            case 'PANDORA_RESULT':
+    window.showPandoraResult(true, payload.task, payload.title, payload.type);
+    break;
+
         case 'MEMORY_FLIP':
             if(window.handleCardClick) window.handleCardClick(payload.index, true);
             break;
@@ -6362,65 +6366,86 @@ window.openPandoraBox = (index, cardEl, backEl, item, isRemote = false, remoteTe
         
     }, 150);
 
-    // Game Over Check (3 boxes opened)
+// Game Over Check (3 boxes opened)
     if (pandoraOpened === 3) {
-        setTimeout(window.showPandoraResult, 1500);
-    }
-};
-
-
-        window.showPandoraResult = () => {
-            const resScreen = document.getElementById('pandora-result');
-            resScreen.classList.remove('hidden');
-            resScreen.classList.add('flex');
-            
-            setTimeout(() => {
-                resScreen.style.opacity = '1';
-                document.getElementById('pandora-final-icon').classList.remove('scale-0');
-                document.getElementById('pandora-final-icon').classList.add('scale-100');
-            }, 50);
-            
-            const title = document.getElementById('pandora-final-title');
-            const desc = document.getElementById('pandora-final-desc');
-            const icon = document.getElementById('pandora-final-icon');
-            const pName = document.getElementById('pandora-result-name');
-            
-            pName.textContent = window.state.names[pandoraTurn];
-
-            // LOGIC FOR PICKING TASK BASED ON GENDER
-            if (pScore.devil > pScore.angel) {
-                // DEVIL WINS -> PUNISHMENT FOR CURRENT PLAYER
-                title.textContent = "HELL UNLEASHED 😈";
-                title.className = "text-4xl font-black text-red-500 fancy-font mb-4 tracking-wide glitch-text";
-                icon.innerHTML = `<div class="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center border-4 border-red-500 shadow-[0_0_50px_red]"><i data-lucide="skull" class="w-12 h-12 text-red-500"></i></div>`;
-                
-                const list = pandoraData[pandoraTurn].Devil;
-                const task = list[Math.floor(Math.random() * list.length)];
-                desc.textContent = task;
-                
-                if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
-
-            } else if (pScore.angel > pScore.devil) {
-                // ANGEL WINS -> REWARD FOR CURRENT PLAYER
-                title.textContent = "PURE BLISS 😇";
-                title.className = "text-4xl font-black text-green-400 fancy-font mb-4 tracking-wide";
-                icon.innerHTML = `<div class="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center border-4 border-green-500 shadow-[0_0_50px_#4ade80]"><i data-lucide="gift" class="w-12 h-12 text-green-400"></i></div>`;
-                
-                const list = pandoraData[pandoraTurn].Angel;
-                const task = list[Math.floor(Math.random() * list.length)];
-                desc.textContent = task;
-                
-                if(navigator.vibrate) navigator.vibrate([100, 100, 100]);
-
-            } else {
-                // DRAW
-                title.textContent = "SAFE... FOR NOW";
-                title.className = "text-3xl font-black text-gray-400 fancy-font mb-4";
-                icon.innerHTML = `<div class="w-24 h-24 rounded-full bg-gray-500/20 flex items-center justify-center border-4 border-gray-500"><i data-lucide="shield" class="w-12 h-12 text-gray-400"></i></div>`;
-                desc.textContent = "You survived with no reward and no punishment. Just a passionate kiss required.";
+        setTimeout(() => {
+            if (!window.state.isMultiplayer || window.state.isHost) {
+                window.showPandoraResult();
             }
-            if(window.lucide) lucide.createIcons();
-        };
+        }, 1500);
+    }
+
+
+        window.showPandoraResult = (isRemote = false, remoteTask = null, remoteTitle = null, remoteType = null) => {
+    const resScreen = document.getElementById('pandora-result');
+    resScreen.classList.remove('hidden');
+    resScreen.classList.add('flex');
+    
+    setTimeout(() => {
+        resScreen.style.opacity = '1';
+        document.getElementById('pandora-final-icon').classList.remove('scale-0');
+        document.getElementById('pandora-final-icon').classList.add('scale-100');
+    }, 50);
+    
+    const title = document.getElementById('pandora-final-title');
+    const desc = document.getElementById('pandora-final-desc');
+    const icon = document.getElementById('pandora-final-icon');
+    const pName = document.getElementById('pandora-result-name');
+    
+    pName.textContent = window.state.names[pandoraTurn];
+
+    let taskText = remoteTask;
+    let finalType = remoteType;
+    let finalTitle = remoteTitle;
+
+    // Agar local call hai (remote nahi hai)
+    if (!isRemote) {
+        if (pScore.devil > pScore.angel) {
+            finalType = 'devil';
+            finalTitle = "HELL UNLEASHED 😈";
+            const list = pandoraData[pandoraTurn].Devil;
+            taskText = list[Math.floor(Math.random() * list.length)];
+        } else if (pScore.angel > pScore.devil) {
+            finalType = 'angel';
+            finalTitle = "PURE BLISS 😇";
+            const list = pandoraData[pandoraTurn].Angel;
+            taskText = list[Math.floor(Math.random() * list.length)];
+        } else {
+            finalType = 'draw';
+            finalTitle = "SAFE... FOR NOW";
+            taskText = "You survived with no reward and no punishment. Just a passionate kiss required.";
+        }
+
+        // Agar Multiplayer hai aur main Host hu, toh partner ko exact result bhejo
+        if (window.state.isMultiplayer && window.state.isHost) {
+            sendStateUpdate('PANDORA_RESULT', {
+                title: finalTitle,
+                task: taskText,
+                type: finalType
+            });
+        }
+    }
+
+    // UI Render logic
+    if (finalType === 'devil') {
+        title.textContent = finalTitle;
+        title.className = "text-4xl font-black text-red-500 fancy-font mb-4 tracking-wide glitch-text";
+        icon.innerHTML = `<div class="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center border-4 border-red-500 shadow-[0_0_50px_red]"><i data-lucide="skull" class="w-12 h-12 text-red-500"></i></div>`;
+        if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
+    } else if (finalType === 'angel') {
+        title.textContent = finalTitle;
+        title.className = "text-4xl font-black text-green-400 fancy-font mb-4 tracking-wide";
+        icon.innerHTML = `<div class="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center border-4 border-green-500 shadow-[0_0_50px_#4ade80]"><i data-lucide="gift" class="w-12 h-12 text-green-400"></i></div>`;
+        if(navigator.vibrate) navigator.vibrate([100, 100, 100]);
+    } else {
+        title.textContent = finalTitle;
+        title.className = "text-3xl font-black text-gray-400 fancy-font mb-4";
+        icon.innerHTML = `<div class="w-24 h-24 rounded-full bg-gray-500/20 flex items-center justify-center border-4 border-gray-500"><i data-lucide="shield" class="w-12 h-12 text-gray-400"></i></div>`;
+    }
+
+    desc.textContent = taskText;
+    if(window.lucide) lucide.createIcons();
+};
 
         window.rotatePandoraTurn = () => {
             pandoraTurn = pandoraTurn === 'Him' ? 'Her' : 'Him';

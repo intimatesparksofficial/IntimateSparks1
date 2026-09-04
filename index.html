@@ -4237,28 +4237,22 @@ window.todAction = (type) => {
 
 
 window.initNHIE = () => {
-    // 1. DATA SYNC: Teri file ki asli nhieStatements array ko utha raha hai
     if (typeof nhieStatements !== 'undefined' && nhieStatements.length > 0) {
-        // Data ko shuffle (mix) kar rahe hain taaki har baar naye sawal aayein
         window.state.nhie.statements = [...nhieStatements].sort(() => Math.random() - 0.5);
     } else {
-        // Fallback agar nhieStatements kisi wajah se na mile
         window.state.nhie.statements = ["Never have I ever wished you were here right now."];
     }
     
-    // 2. RESET STATE: Game ko fresh start karega
     window.state.nhie.currentQ = 0;
     window.state.nhie.himScore = 5;
     window.state.nhie.herScore = 5;
     window.state.nhie.turn = Math.random() < 0.5 ? 'Him' : 'Her';
 
-    // 3. UI UPDATE: Screens dikhayega
     document.getElementById('nhie-game-area').classList.remove('hidden');
     document.getElementById('nhie-punishment-area').classList.add('hidden');
     window.showScreen('nhie');
     window.updateNHIEUI();
 
-    // 4. MULTIPLAYER SYNC: Agar partner connected hai toh usko bhi batao
     if (window.state.isMultiplayer && window.state.isHost) {
         sendStateUpdate('NHIE_INIT', { 
             statements: window.state.nhie.statements, 
@@ -4294,7 +4288,6 @@ window.updateNHIEUI = () => {
     
     btnHim.disabled = (window.state.isMultiplayer && !isMyRoleHim);
     btnHer.disabled = (window.state.isMultiplayer && !isMyRoleHer);
-    
     btnNext.disabled = (window.state.isMultiplayer && !isMyTurn);
     
     if (!window.state.isMultiplayer) {
@@ -4310,7 +4303,6 @@ window.updateNHIEUI = () => {
          btnNext.classList.remove('hidden');
     }
 };
-
         window.NHIEFingerDown = (player) => {
             if (window.state.isMultiplayer && window.state.myRole !== player) {
                  window.showFeedback(`Only ${window.state.names[player]} can confess!`, true);
@@ -6374,7 +6366,7 @@ window.openPandoraBox = (index, cardEl, backEl, item, isRemote = false, remoteTe
             }
         }, 1500);
     }
-
+};
 
         window.showPandoraResult = (isRemote = false, remoteTask = null, remoteTitle = null, remoteType = null) => {
     const resScreen = document.getElementById('pandora-result');

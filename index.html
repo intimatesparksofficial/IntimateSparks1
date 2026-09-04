@@ -2436,6 +2436,77 @@ window.handleReceivedData = (data) => {
             window.updateNHIEUI();
             break;
 
+            case 'NHIE_INIT':
+    window.state.nhie.statements = payload.statements;
+    window.state.nhie.turn = payload.turn;
+    window.state.nhie.currentQ = payload.currentQ || 0;
+    window.state.nhie.himScore = payload.himScore || 5;
+    window.state.nhie.herScore = payload.herScore || 5;
+    document.getElementById('nhie-game-area').classList.remove('hidden');
+    document.getElementById('nhie-punishment-area').classList.add('hidden');
+    window.showScreen('nhie');
+    window.updateNHIEUI();
+    break;
+
+case 'NHIE_QUESTION':
+    window.state.nhie.currentQ = payload.currentQ;
+    window.state.nhie.turn = payload.turn;
+    window.updateNHIEUI();
+    break;
+
+            case 'MEMORY_INIT':
+    window.state.memory.cards = payload.cards;
+    window.state.memory.turn = payload.turn;
+    window.state.memory.score = payload.score || { Him: 0, Her: 0 };
+    window.state.memory.flipped = [];
+    window.state.memory.matched = [];
+    window.state.memory.isLocked = false;
+    window.renderMemoryBoard();
+    window.updateMemoryUI();
+    document.getElementById('memory-action-log').textContent = `Game Ready! ${window.state.names[window.state.memory.turn]}'s turn.`;
+    break;
+
+case 'MEMORY_FLIP':
+    // Partner ne card khola hai, usko remote true karke chalao
+    window.handleCardClick(payload.index, true);
+    break;
+
+case 'MEMORY_MATCH':
+    window.state.memory.score = payload.score;
+    window.state.memory.tempMatch = payload.tempMatch;
+    window.state.memory.matched.push(payload.idx1, payload.idx2);
+    
+    // Cards ko permanently matched set kar do
+    window.state.memory.cards[payload.idx1].isMatched = true;
+    window.state.memory.cards[payload.idx2].isMatched = true;
+    
+    window.state.memory.flipped = [];
+    window.state.memory.isLocked = false;
+    window.renderMemoryBoard();
+    window.updateMemoryUI();
+    document.getElementById('memory-action-log').innerHTML = payload.message;
+    break;
+
+case 'MEMORY_NO_MATCH_TURN':
+    window.state.memory.turn = payload.turn;
+    window.state.memory.cards.forEach(c => { if (!c.isMatched) c.isFlipped = false; });
+    window.state.memory.flipped = [];
+    window.state.memory.isLocked = false;
+    window.renderMemoryBoard();
+    window.updateMemoryUI();
+    document.getElementById('memory-action-log').textContent = `No Match! Turn changed to ${window.state.names[payload.turn]}.`;
+    break;
+
+case 'MEMORY_SHUFFLE':
+    window.state.memory.cards = payload.cards;
+    window.state.memory.turn = payload.turn;
+    window.state.memory.flipped = [];
+    window.state.memory.isLocked = false;
+    window.renderMemoryBoard();
+    window.updateMemoryUI();
+    document.getElementById('memory-action-log').textContent = `Chain break! Cards Shuffled! Turn: ${window.state.names[payload.turn]}.`;
+    break;
+
         case 'MEMORY_FLIP':
             if(window.handleCardClick) window.handleCardClick(payload.index, true);
             break;
@@ -4166,7 +4237,7 @@ window.todAction = (type) => {
         };
 
 
-window.initNHIE = () => {
+window.initNHIEwindow.initNHIE = () => {
     // 1. DATA SYNC: Teri file ki asli nhieStatements array ko utha raha hai
     if (typeof nhieStatements !== 'undefined' && nhieStatements.length > 0) {
         // Data ko shuffle (mix) kar rahe hain taaki har baar naye sawal aayein
@@ -4192,51 +4263,54 @@ window.initNHIE = () => {
     if (window.state.isMultiplayer && window.state.isHost) {
         sendStateUpdate('NHIE_INIT', { 
             statements: window.state.nhie.statements, 
-            turn: window.state.nhie.turn 
+            turn: window.state.nhie.turn,
+            currentQ: window.state.nhie.currentQ,
+            himScore: window.state.nhie.himScore,
+            herScore: window.state.nhie.herScore
         });
     }
 };
 
-        window.updateNHIEUI = () => {
-            const currentQ = window.state.nhie.statements[window.state.nhie.currentQ];
-            const isHimTurn = window.state.nhie.turn === 'Him';
+window.updateNHIEUI = () => {
+    const currentQ = window.state.nhie.statements[window.state.nhie.currentQ];
+    const isHimTurn = window.state.nhie.turn === 'Him';
 
-            document.getElementById('nhie-q-num').textContent = window.state.nhie.currentQ + 1;
-            document.getElementById('nhie-current-question').textContent = currentQ || "Game Over!";
-            document.getElementById('nhie-turn-prompt').textContent = `${window.state.names[window.state.nhie.turn]} will read the statement.`;
-            
-            document.getElementById('nhie-him-score').textContent = window.state.nhie.himScore;
-            document.getElementById('nhie-her-score').textContent = window.state.nhie.herScore;
+    document.getElementById('nhie-q-num').textContent = window.state.nhie.currentQ + 1;
+    document.getElementById('nhie-current-question').textContent = currentQ || "Game Over!";
+    document.getElementById('nhie-turn-prompt').textContent = `${window.state.names[window.state.nhie.turn]} will read the statement.`;
+    
+    document.getElementById('nhie-him-score').textContent = window.state.nhie.himScore;
+    document.getElementById('nhie-her-score').textContent = window.state.nhie.herScore;
 
-            const btnHim = document.getElementById('btn-him-down');
-            const btnHer = document.getElementById('btn-her-down');
-            const btnNext = document.getElementById('btn-nhie-next');
-            
-            btnHim.textContent = `${window.state.names.Him} Did It`;
-            btnHer.textContent = `${window.state.names.Her} Did It`;
+    const btnHim = document.getElementById('btn-him-down');
+    const btnHer = document.getElementById('btn-her-down');
+    const btnNext = document.getElementById('btn-nhie-next');
+    
+    btnHim.textContent = `${window.state.names.Him} Did It`;
+    btnHer.textContent = `${window.state.names.Her} Did It`;
 
-            const isMyRoleHim = window.state.myRole === 'Him';
-            const isMyRoleHer = window.state.myRole === 'Her';
-            const isMyTurn = window.state.isMultiplayer && (window.state.nhie.turn === window.state.myRole);
-            
-            btnHim.disabled = (window.state.isMultiplayer && !isMyRoleHim);
-            btnHer.disabled = (window.state.isMultiplayer && !isMyRoleHer);
-            
-            btnNext.disabled = (window.state.isMultiplayer && !isMyTurn);
-            
-            if (!window.state.isMultiplayer) {
-                 btnHim.disabled = false;
-                 btnHer.disabled = false;
-                 btnNext.disabled = false;
-            }
+    const isMyRoleHim = window.state.myRole === 'Him';
+    const isMyRoleHer = window.state.myRole === 'Her';
+    const isMyTurn = window.state.isMultiplayer && (window.state.nhie.turn === window.state.myRole);
+    
+    btnHim.disabled = (window.state.isMultiplayer && !isMyRoleHim);
+    btnHer.disabled = (window.state.isMultiplayer && !isMyRoleHer);
+    
+    btnNext.disabled = (window.state.isMultiplayer && !isMyTurn);
+    
+    if (!window.state.isMultiplayer) {
+         btnHim.disabled = false;
+         btnHer.disabled = false;
+         btnNext.disabled = false;
+    }
 
-            if (window.state.nhie.himScore <= 0 || window.state.nhie.herScore <= 0) {
-                 window.NHIEEndGame();
-                 btnNext.classList.add('hidden');
-            } else {
-                 btnNext.classList.remove('hidden');
-            }
-        };
+    if (window.state.nhie.himScore <= 0 || window.state.nhie.herScore <= 0) {
+         window.NHIEEndGame();
+         btnNext.classList.add('hidden');
+    } else {
+         btnNext.classList.remove('hidden');
+    }
+};
 
         window.NHIEFingerDown = (player) => {
             if (window.state.isMultiplayer && window.state.myRole !== player) {
@@ -4253,28 +4327,39 @@ window.initNHIE = () => {
             }
         };
 
-        window.nextNHIEQuestion = () => {
-            if (window.state.isMultiplayer && window.state.nhie.turn !== window.state.myRole) {
-                window.showFeedback(`Wait, it's ${window.state.names[window.state.nhie.turn]}'s turn to click Next!`, true);
-                return;
-            }
+     window.nextNHIEQuestion = () => {
+    if (window.state.isMultiplayer && window.state.nhie.turn !== window.state.myRole) {
+        window.showFeedback(`Wait, it's ${window.state.names[window.state.nhie.turn]}'s turn to click Next!`, true);
+        return;
+    }
 
-            if (window.state.nhie.himScore <= 0 || window.state.nhie.herScore <= 0) {
-                window.NHIEEndGame();
-                return;
-            }
-            
-            window.state.nhie.currentQ++;
-            window.state.nhie.turn = window.state.nhie.turn === 'Him' ? 'Her' : 'Him';
+    if (window.state.nhie.himScore <= 0 || window.state.nhie.herScore <= 0) {
+        window.NHIEEndGame();
+        return;
+    }
+    
+    // Agla index aur turn calculate karo
+    const nextQ = window.state.nhie.currentQ + 1;
+    const nextTurn = window.state.nhie.turn === 'Him' ? 'Her' : 'Him';
 
-            if (window.state.nhie.currentQ >= nhieStatements.length) {
-                window.NHIEEndGame(true); 
-                return;
-            }
+    if (nextQ >= window.state.nhie.statements.length) {
+        window.NHIEEndGame(true); 
+        return;
+    }
 
-            window.updateNHIEUI();
-            sendStateUpdate('NHIE_QUESTION', { currentQ: window.state.nhie.currentQ, turn: window.state.nhie.turn });
-        };
+    // Local state update karo
+    window.state.nhie.currentQ = nextQ;
+    window.state.nhie.turn = nextTurn;
+    window.updateNHIEUI();
+
+    // Partner ko sync packet bhejo
+    if (window.state.isMultiplayer) {
+        sendStateUpdate('NHIE_QUESTION', { 
+            currentQ: window.state.nhie.currentQ, 
+            turn: window.state.nhie.turn 
+        });
+    }
+};
 
         window.NHIEEndGame = (isDraw = false) => {
             const himScore = window.state.nhie.himScore;
@@ -4354,39 +4439,44 @@ window.initNHIE = () => {
 
         // --- NEW MEMORY GAME LOGIC (MERGED) ---
         window.initMemory = () => {
-             
-            let cards = [];
-            memoryRewards.forEach((reward, index) => {
-                cards.push({ id: index * 2, rewardIndex: index, isFlipped: false, isMatched: false, icon: reward.icon });
-                cards.push({ id: index * 2 + 1, rewardIndex: index, isFlipped: false, isMatched: false, icon: reward.icon });
-            });
-            
-            cards = cards.sort(() => Math.random() - 0.5);
+    window.showScreen('memory');
 
-            if (!window.state.isMultiplayer || window.state.isHost) {
-                window.state.memory = {
-                    cards: cards,
-                    flipped: [], 
-                    matched: [], 
-                    turn: Math.random() < 0.5 ? 'Him' : 'Her',
-                    score: { Him: 0, Her: 0 },
-                    isLocked: false,
-                    tempMatch: 0 
-                };
-                
-                if (window.state.isHost) {
-                    sendStateUpdate('MEMORY_INIT', { 
-                        cards: window.state.memory.cards,
-                        turn: window.state.memory.turn
-                    });
-                }
-            }
-            
-            window.updateMemoryUI();
-            window.renderMemoryBoard();
-            document.getElementById('memory-action-log').textContent = `Game Ready! ${window.state.names[window.state.memory.turn]}'s turn to flip.`;
+    if (!window.state.isMultiplayer || window.state.isHost) {
+        let cards = [];
+        memoryRewards.forEach((reward, index) => {
+            cards.push({ id: index * 2, rewardIndex: index, isFlipped: false, isMatched: false, icon: reward.icon });
+            cards.push({ id: index * 2 + 1, rewardIndex: index, isFlipped: false, isMatched: false, icon: reward.icon });
+        });
+        
+        // Exact same shuffle
+        cards = cards.sort(() => Math.random() - 0.5);
+
+        window.state.memory = {
+            cards: cards,
+            flipped: [], 
+            matched: [], 
+            turn: Math.random() < 0.5 ? 'Him' : 'Her',
+            score: { Him: 0, Her: 0 },
+            isLocked: false,
+            tempMatch: 0 
         };
-
+        
+        if (window.state.isMultiplayer && window.state.isHost) {
+            sendStateUpdate('MEMORY_INIT', { 
+                cards: window.state.memory.cards,
+                turn: window.state.memory.turn,
+                score: window.state.memory.score
+            });
+        }
+    } else {
+        // Guest ke liye waiting state jab tak Host data na bhej de
+        document.getElementById('memory-action-log').textContent = "Waiting for Host to deal cards...";
+    }
+    
+    window.updateMemoryUI();
+    window.renderMemoryBoard();
+};
+        
         window.renderMemoryBoard = () => {
             const board = document.getElementById('memory-board');
             board.innerHTML = '';
@@ -4433,11 +4523,11 @@ window.initNHIE = () => {
             }
         };
 
-        window.handleCardClick = (index) => {
+ window.handleCardClick = (index, isRemote = false) => {
     const currentTurn = window.state.memory.turn;
     
-    // Check turn lock
-    if (window.state.isMultiplayer && currentTurn !== window.state.myRole) {
+    // Agar local user hai aur uski turn nahi hai, toh roko
+    if (!isRemote && window.state.isMultiplayer && currentTurn !== window.state.myRole) {
         window.showFeedback(`Wait for your turn, ${window.state.names[window.state.myRole]}!`, true);
         return;
     }
@@ -4449,15 +4539,21 @@ window.initNHIE = () => {
     window.state.memory.flipped.push(index);
     window.renderMemoryBoard(); 
 
-    // Partner ko card flip bhejdo
-    sendStateUpdate('MEMORY_FLIP', { index: index });
+    // Agar local click hai toh partner ko bhejo
+    if (!isRemote && window.state.isMultiplayer) {
+        sendStateUpdate('MEMORY_FLIP', { index: index });
+    }
+
+    document.getElementById('memory-action-log').textContent = `Card flipped: ${window.state.memory.flipped.length} of 2.`;
 
     if (window.state.memory.flipped.length === 2) {
         window.state.memory.isLocked = true; 
-        setTimeout(window.checkForMatch, 1000);
+        // Sirf Host match check karega taaki double calculation ya state conflict na ho
+        if (!window.state.isMultiplayer || window.state.isHost) {
+            setTimeout(window.checkForMatch, 1000);
+        }
     }
 };
-;
 
         window.checkForMatch = () => {
             const [idx1, idx2] = window.state.memory.flipped;

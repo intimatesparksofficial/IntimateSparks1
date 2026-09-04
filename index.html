@@ -2466,11 +2466,6 @@ case 'NHIE_QUESTION':
     document.getElementById('memory-action-log').textContent = `Game Ready! ${window.state.names[window.state.memory.turn]}'s turn.`;
     break;
 
-case 'MEMORY_FLIP':
-    // Partner ne card khola hai, usko remote true karke chalao
-    window.handleCardClick(payload.index, true);
-    break;
-
 case 'MEMORY_MATCH':
     window.state.memory.score = payload.score;
     window.state.memory.tempMatch = payload.tempMatch;
@@ -4237,7 +4232,7 @@ window.todAction = (type) => {
         };
 
 
-window.initNHIEwindow.initNHIE = () => {
+window.initNHIE = () => {
     // 1. DATA SYNC: Teri file ki asli nhieStatements array ko utha raha hai
     if (typeof nhieStatements !== 'undefined' && nhieStatements.length > 0) {
         // Data ko shuffle (mix) kar rahe hain taaki har baar naye sawal aayein

@@ -244,6 +244,13 @@
         /* RPS & Flip Card */
         .rps-btn { transition: transform 0.2s; position: relative; overflow: hidden; }
         .rps-btn:active { transform: scale(0.9); }
+        .rps-choice-btn { animation: rps-idle-pulse 2.2s ease-in-out infinite; }
+        .rps-choice-btn:nth-child(2) { animation-delay: 0.2s; }
+        .rps-choice-btn:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes rps-idle-pulse {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
         .hand-shake { animation: shakeHand 1.5s ease-in-out infinite; }
         .winner-glow { box-shadow: 0 0 30px #4ade80; border-color: #4ade80; animation: pulseWin 1s infinite; }
         .flip-card { background-color: transparent; height: 550px; perspective: 1000px; cursor: pointer; opacity: 0; transform: scale(0.8); transition: all 0.5s ease; display: none; }
@@ -1098,35 +1105,50 @@
                     <div id="coupons-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4"></div>
                 </div>
             </div>
-            <!-- RPS ARENA (No changes needed, already max-w-md) -->
-            <div id="rps-arena" class="hidden w-full max-w-md glass-panel p-8 text-center min-h-[400px] flex flex-col justify-center">
-                <button onclick="window.closeRPS(false)" class="absolute top-4 left-4 p-2 bg-white/10 rounded-full"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-                <h3 class="text-xl font-bold text-amber-300 mb-2">Battle Arena</h3>
-                <p id="rps-status" class="text-sm opacity-80 mb-6 font-mono tracking-widest uppercase">Round 1</p>
+            <!-- RPS ARENA (Redesigned - more attractive) -->
+            <div id="rps-arena" class="hidden w-full max-w-md glass-panel p-8 text-center min-h-[400px] flex flex-col justify-center relative overflow-hidden" style="background: radial-gradient(circle at 50% 0%, rgba(190, 24, 93, 0.15) 0%, transparent 60%);">
+                <button onclick="window.closeRPS(false)" class="absolute top-4 left-4 p-2 bg-white/10 rounded-full z-10"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                <h3 class="text-2xl font-black fancy-font mb-1 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-pink-400">⚔️ Battle Arena</h3>
+                <p id="rps-status" class="text-xs opacity-70 mb-6 font-mono tracking-widest uppercase">Round 1</p>
                 <div id="rps-selection-area">
-                    <p class="text-lg font-bold mb-8 text-white" id="p1-name-display">Him's Turn</p>
-                    <div class="flex justify-center gap-6">
-                        <button onclick="window.playRPSMove('rock')" class="rps-btn bg-white/5 p-6 rounded-2xl border border-white/10 hover:border-blue-400"><i data-lucide="hexagon" class="w-12 h-12 text-gray-400 fill-gray-400/20"></i><span class="block text-xs mt-2 uppercase font-bold tracking-wider">Rock</span></button>
-                        <button onclick="window.playRPSMove('paper')" class="rps-btn bg-white/5 p-6 rounded-2xl border border-white/10 hover:border-blue-400"><i data-lucide="file-text" class="w-12 h-12 text-white fill-white/20"></i><span class="block text-xs mt-2 uppercase font-bold tracking-wider">Paper</span></button>
-                        <button onclick="window.playRPSMove('scissors')" class="rps-btn bg-white/5 p-6 rounded-2xl border border-white/10 hover:border-blue-400"><i data-lucide="scissors" class="w-12 h-12 text-red-400"></i><span class="block text-xs mt-2 uppercase font-bold tracking-wider">Scissors</span></button>
+                    <p class="text-lg font-bold mb-8 text-white animate-pulse" id="p1-name-display">Him's Turn</p>
+                    <div class="flex justify-center gap-4 sm:gap-6">
+                        <button onclick="window.playRPSMove('rock')" class="rps-btn rps-choice-btn group flex flex-col items-center gap-2 p-5 rounded-2xl border-2 border-slate-400/30 bg-gradient-to-b from-slate-600/30 to-slate-800/30 hover:border-slate-300 hover:shadow-[0_0_25px_rgba(148,163,184,0.5)] transition-all">
+                            <div class="w-14 h-14 rounded-full bg-slate-400/20 flex items-center justify-center group-hover:scale-110 group-active:scale-90 transition-transform"><i data-lucide="hexagon" class="w-9 h-9 text-slate-300"></i></div>
+                            <span class="block text-[10px] uppercase font-bold tracking-wider text-slate-300">Rock</span>
+                        </button>
+                        <button onclick="window.playRPSMove('paper')" class="rps-btn rps-choice-btn group flex flex-col items-center gap-2 p-5 rounded-2xl border-2 border-cyan-400/30 bg-gradient-to-b from-cyan-600/20 to-cyan-900/30 hover:border-cyan-300 hover:shadow-[0_0_25px_rgba(34,211,238,0.5)] transition-all">
+                            <div class="w-14 h-14 rounded-full bg-cyan-400/20 flex items-center justify-center group-hover:scale-110 group-active:scale-90 transition-transform"><i data-lucide="file-text" class="w-9 h-9 text-cyan-200"></i></div>
+                            <span class="block text-[10px] uppercase font-bold tracking-wider text-cyan-200">Paper</span>
+                        </button>
+                        <button onclick="window.playRPSMove('scissors')" class="rps-btn rps-choice-btn group flex flex-col items-center gap-2 p-5 rounded-2xl border-2 border-rose-400/30 bg-gradient-to-b from-rose-600/20 to-rose-900/30 hover:border-rose-300 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all">
+                            <div class="w-14 h-14 rounded-full bg-rose-400/20 flex items-center justify-center group-hover:scale-110 group-active:scale-90 transition-transform"><i data-lucide="scissors" class="w-9 h-9 text-rose-300"></i></div>
+                            <span class="block text-[10px] uppercase font-bold tracking-wider text-rose-300">Scissors</span>
+                        </button>
                     </div>
                 </div>
                 <div id="rps-countdown" class="hidden">
-                    <div class="flex justify-center gap-12 text-6xl">
-                        <div class="hand-shake"><i data-lucide="thumbs-up" class="w-24 h-24 text-blue-400 rotate-90"></i></div>
-                        <div class="hand-shake" style="animation-delay:0.1s"><i data-lucide="thumbs-up" class="w-24 h-24 text-rose-400 rotate-90 scale-x-[-1]"></i></div>
+                    <div class="flex justify-center items-center gap-6 sm:gap-12 text-6xl">
+                        <div class="hand-shake p-4 rounded-full bg-blue-500/10 border border-blue-400/30"><i data-lucide="thumbs-up" class="w-16 h-16 sm:w-20 sm:h-20 text-blue-400 rotate-90"></i></div>
+                        <span class="text-lg font-black opacity-40">VS</span>
+                        <div class="hand-shake p-4 rounded-full bg-rose-500/10 border border-rose-400/30" style="animation-delay:0.1s"><i data-lucide="thumbs-up" class="w-16 h-16 sm:w-20 sm:h-20 text-rose-400 rotate-90 scale-x-[-1]"></i></div>
                     </div>
-                    <h2 id="countdown-text" class="text-4xl font-black mt-8 text-white">READY...</h2>
+                    <h2 id="countdown-text" class="text-4xl sm:text-5xl font-black mt-8 text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-pink-400 tracking-widest">READY...</h2>
                 </div>
                 <div id="rps-result-area" class="hidden">
-                    <div class="flex justify-center items-center gap-8 mb-6"><div id="res-icon-1" class="p-4 bg-blue-500/20 rounded-xl"></div><div class="text-xl font-bold opacity-50">VS</div><div id="res-icon-2" class="p-4 bg-rose-500/20 rounded-xl"></div></div>
-                    <h2 id="rps-winner-text" class="text-3xl font-bold fancy-font mb-6 text-green-400">Him Wins!</h2>
-                    <p id="rps-result-desc" class="text-sm opacity-70 mb-6">Coupon Unlocked!</p>
+                    <div class="flex justify-center items-center gap-6 sm:gap-8 mb-6">
+                        <div id="res-icon-1" class="p-5 bg-blue-500/20 rounded-2xl border border-blue-400/30 shadow-[0_0_20px_rgba(59,130,246,0.3)]"></div>
+                        <div class="text-xl font-black opacity-50">VS</div>
+                        <div id="res-icon-2" class="p-5 bg-rose-500/20 rounded-2xl border border-rose-400/30 shadow-[0_0_20px_rgba(244,63,94,0.3)]"></div>
+                    </div>
+                    <h2 id="rps-winner-text" class="text-3xl font-black fancy-font mb-2 text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-green-500 drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">Him Wins!</h2>
+                    <p id="rps-result-desc" class="text-sm opacity-80 mb-6">Coupon Unlocked!</p>
                     <button id="claim-btn" onclick="window.closeRPS(true)" class="btn-gradient w-full py-4 rounded-xl font-bold text-lg shadow-lg">Confirm</button>
                     <button id="contract-btn" onclick="window.openContractSign(false)" class="hidden btn-gradient bg-gradient-to-r from-amber-600 to-yellow-600 w-full py-4 rounded-xl font-bold text-lg shadow-lg border border-yellow-400/50">Proceed to Sign Contract ✍️</button>
                 </div>
             </div>
         </div>
+
 
         <!-- 10. NEVER HAVE I EVER (NHIE) - MERGED (Mobile-Optimized Width) -->
         <div id="screen-nhie" class="screen">
@@ -2050,6 +2072,47 @@ window.lockAppNow = () => {
 
 window.checkLicensingStatus = () => true;
 
+        // =========================================================================
+        // 🌐 ONLINE-MODE TASK OVERRIDES
+        // Fill these arrays with your own remote/video-call-friendly tasks.
+        // When Multiplayer is connected (window.state.isMultiplayer === true),
+        // the game will automatically use these arrays instead of the normal
+        // in-person ones — as long as you've added at least 1 item to that list.
+        // Leave an array empty [] and the game will safely fall back to the
+        // original in-person content (so nothing breaks while you're writing).
+        // =========================================================================
+        window.ONLINE_TASKS = {
+            // Risk It All — same 3 intensity levels as the original game
+            risk: {
+                safe: [],
+                spicy: [],
+                extreme: []
+            },
+            // Temptation (Distraction) — key = distractor name used in distractionTasks
+            distraction: {},
+            // Sensory Blindfold — flat list of punishments
+            blindfold: [],
+            // Lip Lust — rewards/punishments per guesser ("Him" / "Her")
+            lipRewards: { Him: [], Her: [] },
+            lipPunishments: { Him: [], Her: [] },
+            // Squeeze Lick Suck — replace the word-combo pools + jackpot list
+            sls: {
+                actions: [],
+                bodyParts: [],
+                durations: [],
+                jackpots: { Mutual: [], Him: [], Her: [] }
+            }
+        };
+
+        // Helper: returns the online override array if it exists and has content,
+        // otherwise falls back to the original array you already had.
+        window.pickPool = (onlinePool, fallbackPool) => {
+            if (window.state.isMultiplayer && Array.isArray(onlinePool) && onlinePool.length > 0) {
+                return onlinePool;
+            }
+            return fallbackPool;
+        };
+
         // --- GLOBAL HELPERS & VARS ---
         window.state = {
             names: { Him: "Him", Her: "Her" },
@@ -2431,6 +2494,40 @@ window.handleReceivedData = (data) => {
             const pBack = document.getElementById(`pandora-back-${payload.index}`);
             window.openPandoraBox(payload.index, pCard, pBack, payload.item, true, payload.text);
             break;
+
+        // --- 6.5. RPS (STONE PAPER SCISSORS) SYNC — was missing, causing the sync bug ---
+        case 'RPS_OPEN': {
+            const rpsCoupon = detailedCoupons.find(c => c.id === payload.couponId);
+            if (rpsCoupon) window.openRPS(rpsCoupon, true);
+            break;
+        }
+
+        case 'RPS_MOVE': {
+            // Ignore stray messages for a different coupon than the one currently open
+            if (!window.state.rps.currentCoupon || payload.couponId !== window.state.rps.currentCoupon.id) break;
+
+            if (payload.role === 'Him') window.state.rps.p1Move = payload.move;
+            if (payload.role === 'Her') window.state.rps.p2Move = payload.move;
+
+            // If it's now my turn to move, unlock my buttons
+            if (window.state.myRole === 'Her' && window.state.rps.p1Move && !window.state.rps.p2Move) {
+                document.getElementById('p1-name-display').textContent = `${window.state.names.Her}'s Turn (Your Move!)`;
+                document.querySelectorAll('.rps-btn').forEach(btn => btn.disabled = false);
+            }
+
+            // Once both moves are known on this device, run the showdown here too
+            if (window.state.rps.p1Move && window.state.rps.p2Move) {
+                window.startRPSShowdown(window.state.rps.p1Move, window.state.rps.p2Move);
+            }
+            break;
+        }
+
+        case 'RPS_WIN_SYNC': {
+            if (payload.vault) { savedVault = payload.vault; localStorage.setItem('contractVault', JSON.stringify(savedVault)); }
+            if (payload.couponStatus) { couponStatus = payload.couponStatus; localStorage.setItem('couponStatus', JSON.stringify(couponStatus)); }
+            if (window.renderCoupons) window.renderCoupons();
+            break;
+        }
 
         // --- 6. MONOPOLY & NHIE & MEMORY ---
         case 'UPDATE_MONOPOLY':
@@ -3168,8 +3265,8 @@ function setupConnection(conn) {
             window.updateTimers();
         };
 
-        window.openRPS = (coupon) => {
-            window.state.rps.currentCoupon = coupon; window.state.rps.p1Move = null; window.state.rps.p2Move = null; window.state.rps.isAutoSaved = false;
+        window.openRPS = (coupon, fromRemote = false) => {
+            window.state.rps.currentCoupon = coupon; window.state.rps.p1Move = null; window.state.rps.p2Move = null; window.state.rps.isAutoSaved = false; window.state.rps.showdownStarted = false;
             document.getElementById('coupon-list-view').classList.add('hidden');
             document.getElementById('rps-arena').classList.remove('hidden');
             document.getElementById('rps-selection-area').classList.remove('hidden');
@@ -3180,6 +3277,7 @@ function setupConnection(conn) {
             let firstPlayer = window.state.names.Him; 
             
             if (window.state.isMultiplayer) {
+                if (!fromRemote) sendStateUpdate('RPS_OPEN', { couponId: coupon.id });
                 if (window.state.myRole === 'Him') {
                     document.getElementById('p1-name-display').textContent = `${firstPlayer}'s Turn (Your Move!)`;
                     document.querySelectorAll('.rps-btn').forEach(btn => btn.disabled = false);
@@ -3225,6 +3323,8 @@ function setupConnection(conn) {
         };
 
         window.startRPSShowdown = (p1, p2) => {
+            if (window.state.rps.showdownStarted) return;
+            window.state.rps.showdownStarted = true;
             document.getElementById('rps-selection-area').classList.add('hidden');
             document.getElementById('rps-countdown').classList.remove('hidden');
             const txt = document.getElementById('countdown-text'); let count = 3; txt.textContent = "ROCK...";
@@ -5412,7 +5512,8 @@ window.explodeBomb = (isRemote = false, remotePunishment = null) => {
         };
 
         window.triggerBlindfoldPunishment = () => {
-            const p = blindfoldPunishments[Math.floor(Math.random() * blindfoldPunishments.length)];
+            const bfPool = window.pickPool(window.ONLINE_TASKS.blindfold, blindfoldPunishments);
+            const p = bfPool[Math.floor(Math.random() * bfPool.length)];
             const pText = document.getElementById('bf-punishment-text');
             const overlay = document.getElementById('bf-punishment-overlay');
             
@@ -5580,8 +5681,8 @@ window.explodeBomb = (isRemote = false, remotePunishment = null) => {
                     badgeColor = "text-red-500 bg-red-600/20 border-red-500/50";
                 }
 
-                // Pick random task from category
-                const tasks = riskTasks[category];
+                // Pick random task from category (uses online-friendly version if in multiplayer)
+                const tasks = window.pickPool(window.ONLINE_TASKS.risk[category], riskTasks[category]);
                 const task = tasks[Math.floor(Math.random() * tasks.length)];
 
                 window.updateRiskUI(currentRiskLevel, task, badgeText, badgeColor);
@@ -5818,7 +5919,7 @@ window.explodeBomb = (isRemote = false, remotePunishment = null) => {
 
                 // Change Distraction Task every 7 seconds
                 if (distractTimeLeft % 7 === 0 && distractTimeLeft > 0) {
-                    const tasks = distractionTasks[distractor];
+                    const tasks = window.pickPool(window.ONLINE_TASKS.distraction[distractor], distractionTasks[distractor]);
                     const task = tasks[Math.floor(Math.random() * tasks.length)];
                     document.getElementById('distract-task').textContent = task;
                     
@@ -6051,9 +6152,11 @@ window.explodeBomb = (isRemote = false, remotePunishment = null) => {
 
             if (isJackpot) {
                 // --- SMART JACKPOT LOGIC ---
-                // Pick from Mutual OR Specific Gender list
-                const pool = [...slsJackpots.Mutual, ...slsJackpots[slsTurn]];
-                const jackpotTask = pool[Math.floor(Math.random() * pool.length)];
+                // Pick from Mutual OR Specific Gender list (uses online-friendly version if in multiplayer)
+                const onlineJackpotPool = (window.state.isMultiplayer && window.ONLINE_TASKS.sls.jackpots.Mutual.length + window.ONLINE_TASKS.sls.jackpots[slsTurn].length > 0)
+                    ? [...window.ONLINE_TASKS.sls.jackpots.Mutual, ...window.ONLINE_TASKS.sls.jackpots[slsTurn]]
+                    : [...slsJackpots.Mutual, ...slsJackpots[slsTurn]];
+                const jackpotTask = onlineJackpotPool[Math.floor(Math.random() * onlineJackpotPool.length)];
                 
                 // Gold Style
                 window.setSlotStyles(true);
@@ -6065,12 +6168,16 @@ window.explodeBomb = (isRemote = false, remotePunishment = null) => {
                 if(navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 500]);
                 
             } else {
-                // --- NORMAL LOGIC ---
+                // --- NORMAL LOGIC (uses online-friendly word pools if in multiplayer) ---
                 window.setSlotStyles(false);
 
-                actEl.textContent = slsActions[Math.floor(Math.random() * slsActions.length)];
-                bodEl.textContent = slsBodyParts[Math.floor(Math.random() * slsBodyParts.length)];
-                timEl.textContent = slsDurations[Math.floor(Math.random() * slsDurations.length)];
+                const actPool = window.pickPool(window.ONLINE_TASKS.sls.actions, slsActions);
+                const bodPool = window.pickPool(window.ONLINE_TASKS.sls.bodyParts, slsBodyParts);
+                const durPool = window.pickPool(window.ONLINE_TASKS.sls.durations, slsDurations);
+
+                actEl.textContent = actPool[Math.floor(Math.random() * actPool.length)];
+                bodEl.textContent = bodPool[Math.floor(Math.random() * bodPool.length)];
+                timEl.textContent = durPool[Math.floor(Math.random() * durPool.length)];
                 
                 if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
             }
@@ -6622,7 +6729,7 @@ window.openPandoraBox = (index, cardEl, backEl, item, isRemote = false, remoteTe
 
             if (correct) {
                 // WIN
-                const list = lipRewards[lipActiveGuesser];
+                const list = window.pickPool(window.ONLINE_TASKS.lipRewards[lipActiveGuesser], lipRewards[lipActiveGuesser]);
                 const r = list[Math.floor(Math.random() * list.length)];
                 
                 title.textContent = "CORRECT! 🎉";
@@ -6635,7 +6742,7 @@ window.openPandoraBox = (index, cardEl, backEl, item, isRemote = false, remoteTe
 
             } else {
                 // LOSE
-                const list = lipPunishments[lipActiveGuesser];
+                const list = window.pickPool(window.ONLINE_TASKS.lipPunishments[lipActiveGuesser], lipPunishments[lipActiveGuesser]);
                 const p = list[Math.floor(Math.random() * list.length)];
                 
                 title.textContent = "WRONG! 😈";
@@ -7701,7 +7808,12 @@ function setupCanvas(canvas) {
 // 2. MAIN GAME CONTROLLER
 window.initScratch = () => {
     try {
-        
+        // Scratch Adventure reveals position images meant to be performed in the same room.
+        // It can't be swapped to text like other games, so it's paused during multiplayer for now.
+        if (window.state.isMultiplayer) {
+            alert("🏠 Scratch Adventure is an in-person only game for now (it reveals physical positions to try together). It's disabled during Multiplayer — play it when you're in the same room!");
+            return;
+        }
 
         const canvas = document.getElementById('scratch-canvas');
         const titleEl = document.getElementById('scratch-title');

@@ -11,12 +11,29 @@
       gtag('config', 'G-290FPCLSW4');
     </script>
 
+   <!-- Essential SEO Tags -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Intimate Sparks | Spicy Multiplayer Games for Couples 🥵🔥</title>
+    <meta name="description" content="Spice up your date night! Play Truth or Dare, Lust Bomb, Monopoly of Love, and 15+ naughty games. Online multiplayer for long-distance or play on one screen.">
+    <meta name="keywords" content="spicy games for couples, games to play with girlfriend on call, long distance relationship games, naughty couple games online, adult truth or dare for couples, bedroom games for couples, multiplayer couples games browser, intimate date night games, fun web games for boyfriend and girlfriend, sexy games to play over text, foreplay games online, romantic spin the wheel, couple roulette game, dirty never have i ever, couples games no app download, honeymoon games in hotel room, anniversary night ideas in bed, games to play during periods, sub dom web games for couples, bdsm lite games online, sensory blindfold game ideas, strip monopoly for couples, ai roleplay generator for couples, dirty roleplay scripts online, naughty fantasy scenarios, free dirty games on phone browser">
+    <meta name="author" content="Intimate Sparks">
+    <meta name="theme-color" content="#1a0505">
 
-    <title>Intimate Sparks | The Ultimate Couple's Game 🌙</title>
-    <meta name="description" content="Intimate Sparks is the ultimate spicy web game for couples. Spice up your date night with Truth or Dare, Lust Bomb, and more.">
-    <meta property="og:title" content="Intimate Sparks | Make Every Night Count 🥵🔥">
+    <!-- Open Graph / Facebook / WhatsApp (Link Preview Tags) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://intimatesparksofficial.github.io/IntimateSparks1/">
+    <meta property="og:title" content="Intimate Sparks | Make Every Night Count 🌙">
+    <meta property="og:description" content="The ultimate spicy web game for couples. Connect directly, play intimately. Free trials available tonight! 😉">
+    <meta property="og:image" content="https://files.catbox.moe/wvokpx.jpeg">
+    <meta property="og:site_name" content="Intimate Sparks">
+
+    <!-- Twitter / X Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://intimatesparksofficial.github.io/IntimateSparks1/">
+    <meta name="twitter:title" content="Intimate Sparks | The Ultimate Couple's Game 🔥">
+    <meta name="twitter:description" content="Spice up your date night! Play 15+ naughty games for couples. Online multiplayer or in-person.">
+    <meta name="twitter:image" content="https://files.catbox.moe/wvokpx.jpeg">
     
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -224,6 +241,34 @@
             .glass-panel { padding: 1rem !important; border-radius: 1.1rem; }
             .game-card { padding: 1rem !important; }
         }
+
+        /* =========================================================================
+           📱 MOBILE PERFORMANCE PASS
+           backdrop-filter blur + layered box-shadows + always-running sweep
+           animations are the main causes of jank/lag on mid-range phones.
+           Cut them down (not off) on touch/small-screen devices only —
+           desktop keeps the full effect.
+           ========================================================================= */
+        @media (max-width: 768px), (pointer: coarse) {
+            .glass-panel,
+            #main-header,
+            #floating-chat-modal,
+            #music-panel,
+            .modal-overlay {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            /* The diagonal shine-sweep + border-glow on every game card is
+               costly to repaint on scroll on low-end GPUs — keep the
+               static border, drop the constantly-animatable sweep. */
+            .game-card::before { display: none; }
+            .game-card::after { opacity: 0.35; }
+            /* Card entrance stagger still looks nice but shouldn't block
+               first paint/scroll on slower phones. */
+            #screen-home .game-card { animation-duration: 0.35s; }
+        }
+        #main-header { will-change: transform; }
+        .glass-panel, #floating-chat-modal { contain: layout style; }
         
         /* MOVIE PICKER STYLES (UPDATED FOR CLEANER MOBILE UI) */
         .genre-btn { 
@@ -679,7 +724,7 @@
         </div>
     </div>
     
-    <header id="main-header" class="w-full max-w-5xl flex justify-between items-center py-3 z-150 fixed top-0 px-4 backdrop-blur-md bg-black/30 border-b border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 opacity-0 pointer-events-none">
+    <header id="main-header" class="w-full max-w-5xl flex justify-between items-center py-3 z-150 fixed top-0 left-1/2 -translate-x-1/2 px-4 backdrop-blur-md bg-black/30 border-b border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 opacity-0 pointer-events-none">
 
     <div class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onclick="window.showScreen('home')">
         <div class="p-2 bg-white/10 rounded-lg"><i data-lucide="layout-grid" class="w-5 h-5 text-white"></i></div>
@@ -700,8 +745,37 @@
         <button onclick="window.showScreen('setup')" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors"><i data-lucide="settings" class="w-5 h-5 text-white"></i></button>
     </div>
 </header>
-
-
+<script>
+// Auto-hide top header while scrolling down (so it stops permanently
+// covering content on long/mobile screens); re-appears on scroll up
+// or near the very top. Purely additive — doesn't touch existing
+// show/hide-on-screen-change logic.
+(function () {
+    var header = document.getElementById('main-header');
+    var lastY = window.scrollY || 0;
+    var ticking = false;
+    function onScroll() {
+        var y = window.scrollY || 0;
+        var goingDown = y > lastY + 6;
+        var goingUp = y < lastY - 6;
+        if (header && !header.classList.contains('opacity-0')) {
+            if (goingDown && y > 80) {
+                header.classList.add('-translate-y-full');
+            } else if (goingUp || y < 80) {
+                header.classList.remove('-translate-y-full');
+            }
+        }
+        lastY = y;
+        ticking = false;
+    }
+    window.addEventListener('scroll', function () {
+        if (!ticking) {
+            requestAnimationFrame(onScroll);
+            ticking = true;
+        }
+    }, { passive: true });
+})();
+</script>
 
     <div id="music-panel" class="glass-panel p-4">
         <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
@@ -4095,6 +4169,13 @@ function setupConnection(conn) {
             { id: 100, type: "Him", title: "Compliment List", desc: "She writes 10 things she loves about him.", icon: "list" }
         ];
 
+        // Same convention as the AI Fantasies role images: put a matching
+        // image file (e.g. "QUEENS COMMAND.jpeg") next to this HTML file and
+        // it'll show automatically. No file yet? The image area just stays
+        // hidden — nothing breaks. Override per-coupon by adding an `img`
+        // field to that entry in detailedCoupons if you want a different filename.
+        window.couponImgFile = (title) => title.toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim() + '.jpeg';
+
         window.renderCoupons = () => {
             
             const grid = document.getElementById('coupons-grid'); grid.innerHTML = '';
@@ -4116,8 +4197,10 @@ function setupConnection(conn) {
                     statusHtml = `<p class='text-[10px] font-bold text-amber-400 mt-1 opacity-70'>CLICK TO BATTLE</p>`;
                 }
 
-                el.className = `coupon-card p-4 rounded-xl flex items-start justify-between cursor-pointer border ${borderColor} ${cardClass}`;
-                el.innerHTML = `<div class="coupon-hole left-[-10px]"></div><div class="flex-1 pr-2"><div class="flex items-center gap-2 mb-1"><span class="target-badge ${badgeClass}">${c.type === 'Both' ? 'FOR BOTH' : (c.type === 'Him' ? 'FOR HIM' : 'FOR HER')}</span></div><h3 class="font-bold text-lg leading-tight mb-1 text-white">${c.title}</h3><p class="text-xs opacity-70 leading-relaxed">${c.desc}</p>${statusHtml}</div><div class="flex flex-col items-center justify-center pl-2 border-l border-white/10"><i data-lucide="${c.icon}" class="w-6 h-6 opacity-60 mb-1"></i>${status && status.type === 'won' ? '<i data-lucide="check" class="w-4 h-4 text-green-400"></i>' : '<span class="text-[8px] uppercase opacity-40">RPS</span>'}</div><div class="coupon-hole right-[-10px]"></div>`;
+                const imgSrc = c.img || window.couponImgFile(c.title);
+
+                el.className = `coupon-card p-4 rounded-xl flex items-stretch justify-between cursor-pointer border ${borderColor} ${cardClass} min-h-[110px]`;
+                el.innerHTML = `<div class="coupon-hole left-[-10px]"></div><div class="flex-1 pr-2 relative z-10 flex flex-col justify-center"><div class="flex items-center gap-2 mb-1"><span class="target-badge ${badgeClass}">${c.type === 'Both' ? 'FOR BOTH' : (c.type === 'Him' ? 'FOR HIM' : 'FOR HER')}</span></div><h3 class="font-bold text-lg leading-tight mb-1 text-white">${c.title}</h3><p class="text-xs opacity-70 leading-relaxed">${c.desc}</p>${statusHtml}</div><div class="relative w-20 sm:w-24 flex-shrink-0 rounded-lg overflow-hidden self-stretch"><div class="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-black/70 to-transparent z-10"></div><img src="${imgSrc}" onerror="this.parentElement.style.display='none'" class="w-full h-full object-cover object-center" alt=""><div class="absolute bottom-1 right-1 bg-black/60 rounded-full p-1.5 z-10">${status && status.type === 'won' ? '<i data-lucide="check" class="w-3.5 h-3.5 text-green-400"></i>' : `<i data-lucide="${c.icon}" class="w-3.5 h-3.5 text-white"></i>`}</div></div><div class="coupon-hole right-[-10px]"></div>`;
                 if(isClickable) el.onclick = () => window.openRPS(c);
                 grid.appendChild(el);
             });
@@ -9451,11 +9534,13 @@ window.addEventListener('load', () => {
 ═══════════════════════════════════════════════════════ -->
 <div id="floating-chat-modal"
     class="hidden fixed z-[99999]"
-    style="bottom:5.5rem;right:1.25rem;width:min(92vw,340px);height:480px;
+    style="bottom:calc(5.5rem + env(safe-area-inset-bottom));right:1.25rem;
+           width:min(92vw,340px);height:min(480px,72dvh);max-height:72dvh;
            background:rgba(10,8,18,0.97);backdrop-filter:blur(24px);
            border:1px solid rgba(194,85,106,0.25);border-radius:1.25rem;
            box-shadow:0 24px 64px rgba(0,0,0,0.7);
-           display:none;flex-direction:column;overflow:hidden;">
+           display:none;flex-direction:column;overflow:hidden;
+           transition:bottom 0.2s ease;">
 
     <!-- Header -->
     <div style="display:flex;justify-content:space-between;align-items:center;
@@ -9520,22 +9605,44 @@ window.addEventListener('load', () => {
     <!-- Input Row -->
     <div style="display:flex;gap:0.4rem;padding:0.6rem 0.75rem;border-top:1px solid rgba(255,255,255,0.07);background:rgba(0,0,0,0.4);align-items:center;">
 
-        <!-- Image picker (hidden input) -->
+        <!-- Hidden inputs -->
         <input type="file" id="chat-img-input" accept="image/*" style="display:none;" onchange="window.handleImagePick(event)">
+        <input type="file" id="chat-cam-input" accept="image/*" capture="environment" style="display:none;" onchange="window.handleImagePick(event)">
 
-        <!-- Image btn -->
-        <button onclick="document.getElementById('chat-img-input').click()"
-            title="Send image (stays private, peer-to-peer only)"
-            style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.05);
-                   border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;
-                   justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.2s;"
-            onmouseover="this.style.background='rgba(194,85,106,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
-            <i data-lucide="image" style="width:15px;height:15px;color:rgba(240,234,240,0.5);"></i>
-        </button>
+        <!-- Attach (combines Camera + Gallery into one control to cut clutter) -->
+        <div style="position:relative;flex-shrink:0;">
+            <button id="attach-toggle-btn" onclick="window.toggleAttachMenu()"
+                title="Add a photo"
+                style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.05);
+                       border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;
+                       justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.2s;"
+                onmouseover="this.style.background='rgba(194,85,106,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                <i data-lucide="plus" style="width:16px;height:16px;color:rgba(240,234,240,0.5);"></i>
+            </button>
+            <div id="attach-menu" style="display:none;position:absolute;bottom:42px;left:0;
+                        background:rgba(20,16,28,0.98);border:1px solid rgba(194,85,106,0.25);
+                        border-radius:0.75rem;padding:0.35rem;box-shadow:0 8px 24px rgba(0,0,0,0.5);
+                        display:flex;flex-direction:column;gap:0.15rem;min-width:130px;">
+                <button onclick="window.toggleAttachMenu(); window.openCameraModal();"
+                    style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.6rem;
+                           background:transparent;border:none;border-radius:0.5rem;cursor:pointer;
+                           color:rgba(240,234,240,0.85);font-size:0.75rem;text-align:left;"
+                    onmouseover="this.style.background='rgba(194,85,106,0.15)'" onmouseout="this.style.background='transparent'">
+                    <i data-lucide="camera" style="width:15px;height:15px;"></i> Camera
+                </button>
+                <button onclick="window.toggleAttachMenu(); document.getElementById('chat-img-input').click();"
+                    style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.6rem;
+                           background:transparent;border:none;border-radius:0.5rem;cursor:pointer;
+                           color:rgba(240,234,240,0.85);font-size:0.75rem;text-align:left;"
+                    onmouseover="this.style.background='rgba(194,85,106,0.15)'" onmouseout="this.style.background='transparent'">
+                    <i data-lucide="image" style="width:15px;height:15px;"></i> Gallery
+                </button>
+            </div>
+        </div>
 
         <!-- Voice btn -->
         <button id="voice-btn" onclick="window.toggleVoiceRecording()"
-            title="Hold to record voice note"
+            title="Record voice note"
             style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.05);
                    border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;
                    justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.2s;"
@@ -9561,6 +9668,100 @@ window.addEventListener('load', () => {
                    transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 2px 10px rgba(194,85,106,0.4);"
             onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
             <i data-lucide="send" style="width:14px;height:14px;color:#fff;"></i>
+        </button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     CAMERA MODAL — Live preview + capture + send
+═══════════════════════════════════════════════════════ -->
+<div id="camera-modal"
+    style="display:none;position:fixed;inset:0;z-index:999999;
+           background:rgba(0,0,0,0.97);flex-direction:column;
+           align-items:center;justify-content:center;">
+
+    <!-- Header -->
+    <div style="position:absolute;top:0;left:0;right:0;padding:1rem 1.25rem;
+                display:flex;justify-content:space-between;align-items:center;
+                background:linear-gradient(to bottom,rgba(0,0,0,0.7),transparent);z-index:2;">
+        <span style="font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;
+                     color:rgba(240,234,240,0.5);">Camera · P2P only</span>
+        <button onclick="window.closeCameraModal()"
+            style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.1);
+                   border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;
+                   justify-content:center;cursor:pointer;">
+            <i data-lucide="x" style="width:16px;height:16px;color:#f0eaf0;"></i>
+        </button>
+    </div>
+
+    <!-- Video preview -->
+    <video id="cam-video" autoplay playsinline muted
+        style="width:100%;max-width:480px;max-height:70vh;object-fit:cover;
+               border-radius:1rem;background:#000;"></video>
+
+    <!-- Canvas (hidden, used for capture) -->
+    <canvas id="cam-canvas" style="display:none;"></canvas>
+
+    <!-- Preview image (shown after capture) -->
+    <img id="cam-preview" style="display:none;width:100%;max-width:480px;max-height:70vh;
+                                  object-fit:cover;border-radius:1rem;" alt="Preview">
+
+    <!-- Controls -->
+    <div id="cam-controls-shoot"
+        style="position:absolute;bottom:0;left:0;right:0;
+               padding:1.5rem 1.25rem 2rem;
+               background:linear-gradient(to top,rgba(0,0,0,0.85),transparent);
+               display:flex;justify-content:center;align-items:center;gap:1.5rem;z-index:2;">
+
+        <!-- Flip camera -->
+        <button onclick="window.flipCamera()"
+            style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.12);
+                   border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;
+                   justify-content:center;cursor:pointer;">
+            <i data-lucide="refresh-cw" style="width:18px;height:18px;color:#f0eaf0;"></i>
+        </button>
+
+        <!-- Shutter -->
+        <button onclick="window.capturePhoto()"
+            style="width:68px;height:68px;border-radius:50%;
+                   background:linear-gradient(135deg,#c2556a,#9b3a50);
+                   border:4px solid rgba(255,255,255,0.25);
+                   box-shadow:0 0 24px rgba(194,85,106,0.6);
+                   display:flex;align-items:center;justify-content:center;cursor:pointer;
+                   transition:transform 0.15s;" id="shutter-btn"
+            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <i data-lucide="camera" style="width:26px;height:26px;color:#fff;"></i>
+        </button>
+
+        <!-- Switch to front/back label -->
+        <button onclick="document.getElementById('chat-cam-input').click()"
+            style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.12);
+                   border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;
+                   justify-content:center;cursor:pointer;" title="Open from files instead">
+            <i data-lucide="folder-open" style="width:18px;height:18px;color:#f0eaf0;"></i>
+        </button>
+    </div>
+
+    <!-- After capture: confirm / retake controls -->
+    <div id="cam-controls-confirm"
+        style="display:none;position:absolute;bottom:0;left:0;right:0;
+               padding:1.5rem 1.25rem 2rem;
+               background:linear-gradient(to top,rgba(0,0,0,0.85),transparent);
+               display:none;justify-content:center;align-items:center;gap:1rem;z-index:2;">
+
+        <button onclick="window.retakePhoto()"
+            style="padding:0.65rem 1.4rem;border-radius:99px;
+                   background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+                   color:#f0eaf0;font-size:0.8rem;cursor:pointer;">
+            Retake
+        </button>
+
+        <button onclick="window.sendCapturedPhoto()"
+            style="padding:0.65rem 1.6rem;border-radius:99px;
+                   background:linear-gradient(135deg,#c2556a,#9b3a50);
+                   border:none;color:#fff;font-size:0.8rem;font-weight:500;
+                   cursor:pointer;box-shadow:0 4px 16px rgba(194,85,106,0.4);">
+            Send 💋
         </button>
     </div>
 </div>
@@ -9643,6 +9844,36 @@ window.toggleFloatingChat = () => {
     }
     if(window.lucide) lucide.createIcons();
 };
+
+// ── attach menu (Camera / Gallery combined) ──────────
+window.toggleAttachMenu = () => {
+    const menu = document.getElementById('attach-menu');
+    if (!menu) return;
+    menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+};
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('attach-menu');
+    const btn = document.getElementById('attach-toggle-btn');
+    if (menu && menu.style.display === 'flex' && !menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+        menu.style.display = 'none';
+    }
+});
+
+// ── keep chat input above the on-screen keyboard on mobile ──
+// (fixed-position elements anchored to the layout viewport can end up
+// hidden behind the keyboard on phones; visualViewport tracks the
+// actually-visible area, so nudge the modal up while the keyboard is open)
+if (window.visualViewport) {
+    const chatModal = () => document.getElementById('floating-chat-modal');
+    window.visualViewport.addEventListener('resize', () => {
+        const modal = chatModal();
+        if (!modal || modal.style.display !== 'flex') return;
+        const keyboardInset = Math.max(0, window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop);
+        modal.style.bottom = keyboardInset > 60
+            ? (keyboardInset + 12) + 'px'
+            : 'calc(5.5rem + env(safe-area-inset-bottom))';
+    });
+}
 
 // ── text message ─────────────────────────────────────
 window.sendChatMessage = () => {
@@ -9844,6 +10075,131 @@ window.handleImagePick = (event) => {
     };
     reader.readAsDataURL(file);
     event.target.value='';
+};
+
+// ── CAMERA MODULE ────────────────────────────────────
+let _camStream = null;
+let _camFacing = 'user'; // start with front camera (selfie)
+let _capturedB64 = null;
+let _capturedMime = 'image/jpeg';
+
+window.openCameraModal = async () => {
+    if(!window.state || !window.state.isMultiplayer || !window.state.connection){
+        window.showFeedback('Connect in multiplayer first!',true); return;
+    }
+    const modal = document.getElementById('camera-modal');
+    modal.style.display = 'flex';
+    if(window.lucide) lucide.createIcons();
+    await _startCamStream();
+};
+
+window.closeCameraModal = () => {
+    _stopCamStream();
+    const modal = document.getElementById('camera-modal');
+    modal.style.display = 'none';
+    _resetCamUI();
+};
+
+async function _startCamStream() {
+    _stopCamStream();
+    try {
+        _camStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: _camFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false
+        });
+        const video = document.getElementById('cam-video');
+        video.srcObject = _camStream;
+        video.style.display = 'block';
+        document.getElementById('cam-preview').style.display = 'none';
+        document.getElementById('cam-controls-shoot').style.display = 'flex';
+        document.getElementById('cam-controls-confirm').style.display = 'none';
+    } catch(err) {
+        // Fallback: open native camera file picker
+        window.closeCameraModal();
+        document.getElementById('chat-cam-input').click();
+        console.warn('Camera stream failed, falling back to file picker:', err);
+    }
+}
+
+function _stopCamStream() {
+    if(_camStream){ _camStream.getTracks().forEach(t => t.stop()); _camStream = null; }
+}
+
+function _resetCamUI() {
+    const video = document.getElementById('cam-video');
+    video.srcObject = null;
+    _capturedB64 = null;
+}
+
+window.flipCamera = async () => {
+    _camFacing = _camFacing === 'user' ? 'environment' : 'user';
+    await _startCamStream();
+};
+
+window.capturePhoto = () => {
+    const video = document.getElementById('cam-video');
+    const canvas = document.getElementById('cam-canvas');
+    const preview = document.getElementById('cam-preview');
+
+    // Match canvas to video dimensions
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
+
+    const ctx = canvas.getContext('2d');
+
+    // Mirror horizontally if front camera
+    if(_camFacing === 'user'){
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+    }
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Store as JPEG base64
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+    _capturedB64  = dataUrl.split(',')[1];
+    _capturedMime = 'image/jpeg';
+
+    // Show preview
+    preview.src = dataUrl;
+    preview.style.display = 'block';
+    video.style.display = 'none';
+
+    // Shutter flash effect
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999999;opacity:0.7;pointer-events:none;transition:opacity 0.3s;';
+    document.body.appendChild(flash);
+    setTimeout(()=>{ flash.style.opacity='0'; setTimeout(()=>flash.remove(),350); }, 50);
+
+    // Switch controls
+    document.getElementById('cam-controls-shoot').style.display = 'none';
+    document.getElementById('cam-controls-confirm').style.display = 'flex';
+
+    _stopCamStream();
+};
+
+window.retakePhoto = async () => {
+    _capturedB64 = null;
+    document.getElementById('cam-controls-confirm').style.display = 'none';
+    await _startCamStream();
+};
+
+window.sendCapturedPhoto = () => {
+    if(!_capturedB64){ window.closeCameraModal(); return; }
+    const container = document.getElementById('chat-messages-container');
+
+    // Show spinner briefly
+    const spinner = document.createElement('div');
+    spinner.className = 'chat-msg-row-me';
+    spinner.innerHTML = `<div class="img-sending-spinner">Sending photo…</div>`;
+    container.appendChild(spinner);
+    scrollBottom();
+
+    setTimeout(()=>{
+        container.removeChild(spinner);
+        window.appendMediaMessage(_capturedB64, _capturedMime, 'me');
+        sendMediaP2P(_capturedB64, _capturedMime);
+        window.closeCameraModal();
+    }, 100);
 };
 
 })(); // end IIFE

@@ -17,7 +17,6 @@
     <title>Intimate Sparks | The Ultimate Couple's Game 🌙</title>
     <meta name="description" content="Intimate Sparks is the ultimate spicy web game for couples. Spice up your date night with Truth or Dare, Lust Bomb, and more.">
     <meta property="og:title" content="Intimate Sparks | Make Every Night Count 🥵🔥">
-    ```
     
     <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -114,6 +113,117 @@
         .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--accent-rgb), 0.5); }
         .game-card { transition: all 0.4s ease; cursor: pointer; position: relative; overflow: hidden; }
         .game-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--accent-color); background: rgba(255, 255, 255, 0.1); }
+
+        /* =========================================================================
+           📱 MOBILE-FIRST & GENERAL POLISH PASS
+           ========================================================================= */
+
+        /* Respect notch/home-indicator safe areas on iPhones so content & buttons
+           never sit under the status bar or get clipped by the bottom gesture bar. */
+        body {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        /* Fluid, screen-size-aware headings so text never overflows small phones
+           or looks tiny on tablets/desktop. */
+        h1, .text-fluid-xl { font-size: clamp(1.5rem, 5vw, 2.5rem); }
+        h2, .text-fluid-lg { font-size: clamp(1.15rem, 3.5vw, 1.75rem); }
+
+        /* Every tappable control gets a real touch target (Apple/Google both
+           recommend 44px min) plus a satisfying press-down effect, since mobile
+           has no ":hover" — the feedback has to come from ":active". */
+        button, .game-card, .rps-btn, [onclick] {
+            -webkit-tap-highlight-color: transparent;
+        }
+        button, .btn-option, .btn-gradient {
+            min-height: 44px;
+        }
+        button:active, .btn-gradient:active, .btn-option:active, .game-card:active {
+            transform: scale(0.96);
+            transition: transform 0.1s ease;
+        }
+
+        /* Game cards: a soft glowing border sweep on hover/focus (desktop) and a
+           gentle "breathing" glow at rest on mobile so the grid feels alive
+           instead of static. */
+        .game-card {
+            position: relative;
+        }
+        .game-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.5), transparent 40%, transparent 60%, rgba(244, 63, 94, 0.3));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .game-card:hover::after, .game-card:active::after { opacity: 1; }
+
+        /* Staggered entrance: each game card in the home grid fades/rises in
+           slightly after the one before it, instead of all popping at once. */
+        #screen-home .game-card {
+            animation: cardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+        #screen-home .game-card:nth-child(1) { animation-delay: 0.05s; }
+        #screen-home .game-card:nth-child(2) { animation-delay: 0.10s; }
+        #screen-home .game-card:nth-child(3) { animation-delay: 0.15s; }
+        #screen-home .game-card:nth-child(4) { animation-delay: 0.20s; }
+        #screen-home .game-card:nth-child(5) { animation-delay: 0.25s; }
+        #screen-home .game-card:nth-child(6) { animation-delay: 0.30s; }
+        #screen-home .game-card:nth-child(n+7) { animation-delay: 0.35s; }
+        @keyframes cardEnter { from { opacity: 0; transform: translateY(16px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* Subtle diagonal shine sweeping across a card on hover/tap — a small
+           premium touch that makes the grid feel alive without being noisy. */
+        .game-card { isolation: isolate; }
+        .game-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.08) 40%, transparent 60%);
+            transform: translateX(-120%);
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .game-card:hover::before, .game-card:active::before { transform: translateX(120%); }
+
+        /* Any modal/popup taller than the viewport becomes internally scrollable
+           instead of getting cut off on short mobile screens (older iPhones,
+           landscape mode, split-screen Android) — scoped to actual overlay
+           modals, not every glass-panel (many are full-page containers). */
+        .modal-overlay .glass-panel,
+        .popup-container-fixed .glass-panel,
+        [id$="-modal"] .glass-panel {
+            max-height: 92vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Slim, on-brand scrollbar for the scrollable panels above (Chrome/Edge/Safari). */
+        .glass-panel::-webkit-scrollbar { width: 5px; }
+        .glass-panel::-webkit-scrollbar-thumb { background: rgba(244, 63, 94, 0.4); border-radius: 10px; }
+        .glass-panel::-webkit-scrollbar-track { background: transparent; }
+
+        /* Prevent iOS "zoom on input focus" (which happens if a font is under
+           16px) — this was likely making text fields feel janky on iPhones. */
+        input, select, textarea { font-size: 16px !important; }
+
+        /* Small screens: tighten card padding a touch so 2-column grids
+           (coupons, options) don't feel cramped edge-to-edge. */
+        @media (max-width: 380px) {
+            .glass-panel { padding: 1rem !important; border-radius: 1.1rem; }
+            .game-card { padding: 1rem !important; }
+        }
         
         /* MOVIE PICKER STYLES (UPDATED FOR CLEANER MOBILE UI) */
         .genre-btn { 
@@ -217,11 +327,12 @@
             min-height: 80vh; 
             justify-content: center; 
             opacity: 0; 
-            transition: opacity 0.4s ease-in-out; 
+            transform: translateY(14px) scale(0.98);
+            transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1); 
             padding-top: 2rem; 
             padding-bottom: 2rem;
         }
-        .screen.active { display: flex; opacity: 1; }
+        .screen.active { display: flex; opacity: 1; transform: translateY(0) scale(1); }
         .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
@@ -568,16 +679,20 @@
         </div>
     </div>
     
-    <header id="main-header" class="w-full max-w-5xl flex justify-between items-center py-4 z-150 fixed top-0 px-4 backdrop-blur-sm bg-black/20 transition-all duration-300 opacity-0 pointer-events-none">
+    <header id="main-header" class="w-full max-w-5xl flex justify-between items-center py-3 z-150 fixed top-0 px-4 backdrop-blur-md bg-black/30 border-b border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 opacity-0 pointer-events-none">
 
-    <div class="flex items-center gap-2 cursor-pointer hover:opacity-80" onclick="window.showScreen('home')">
+    <div class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onclick="window.showScreen('home')">
         <div class="p-2 bg-white/10 rounded-lg"><i data-lucide="layout-grid" class="w-5 h-5 text-white"></i></div>
-        <span class="font-bold tracking-wider hidden md:block">HOME</span>
+        <span class="font-bold tracking-wider hidden md:block text-sm">HOME</span>
     </div>
-    <div class="flex gap-3">
+    <div class="flex gap-2 sm:gap-3 items-center">
+        <button onclick="window.openPlaybook()" class="bg-white/10 hover:bg-white/20 border border-white/20 p-2 rounded-full transition-colors relative group">
+            <i data-lucide="help-circle" class="w-5 h-5 text-indigo-300"></i>
+            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] bg-black text-indigo-300 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Guide</span>
+        </button>
         <button onclick="window.openStore()" class="bg-amber-500/20 hover:bg-amber-500/40 border border-amber-500/50 p-2 rounded-full transition-colors relative group">
             <i data-lucide="crown" class="w-5 h-5 text-amber-400 fill-amber-400/20"></i>
-            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] bg-black text-amber-400 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">VIP Store</span>
+            <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] bg-black text-amber-400 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">VIP Store</span>
         </button>
 
         <button onclick="window.toggleMusicPanel()" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors relative"><i data-lucide="music" class="w-5 h-5 text-white"></i><span id="music-indicator" class="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full hidden"></span></button>
@@ -585,11 +700,6 @@
         <button onclick="window.showScreen('setup')" class="bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors"><i data-lucide="settings" class="w-5 h-5 text-white"></i></button>
     </div>
 </header>
-
-<button onclick="window.openPlaybook()" class="mr-20 bg-white/10 hover:bg-white/20 border border-white/20 p-2 rounded-full transition-colors relative group">
-    <i data-lucide="help-circle" class="w-5 h-5 text-indigo-300"></i>
-    <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] bg-black text-indigo-300 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Guide</span>
-</button>
 
 
 
@@ -2081,31 +2191,762 @@ window.checkLicensingStatus = () => true;
         // Leave an array empty [] and the game will safely fall back to the
         // original in-person content (so nothing breaks while you're writing).
         // =========================================================================
+        // =========================================================================
+        // 🌐 ONLINE-MODE MASSIVE TASK OVERRIDES (50+ ITEMS PER GAME, FULL ENGLISH)
+        // =========================================================================
         window.ONLINE_TASKS = {
-            // Risk It All — same 3 intensity levels as the original game
-            risk: {
-                safe: [],
-                spicy: [],
-                extreme: []
+            
+            // 1. TRUTH OR DARE (TOD) - 50+ Truths & 50+ Dares (With Him/Her split support)
+            tod: {
+                truths: {
+                    Him: [
+                        "Have you ever touched yourself while looking at my social media pictures?",
+                        "What is the most graphic sexual fantasy you've ever had about us?",
+                        "Would you let me tie you up and control you completely for an entire night?",
+                        "Have you ever faked enjoying a certain position just to please me?",
+                        "What is the dirtiest thing you've ever searched for online when you were alone?",
+                        "If we were in a public elevator right now, would you have the guts to kiss me passionately?",
+                        "What is the exact moment or text message of mine that turned you on the most?",
+                        "Do you prefer me being dominant and rough, or soft and sweet in bed?",
+                        "Have you ever thought about any of my friends or people we know in a sexual way?",
+                        "What is a dirty word you desperately want to hear me whisper in your ear?",
+                        "How long have you lasted without touching yourself after thinking of me?",
+                        "Have you ever secretly recorded or wanted to record an intimate moment of us?",
+                        "What is the craziest, most forbidden place you've ever wanted to hook up?",
+                        "Do you like when I take control without asking, or do you prefer discussing it first?",
+                        "What is the one thing I do during intimacy that drives you absolutely wild?",
+                        "Have you ever imagined me wearing something specific just for you?",
+                        "Would you swallow if I asked you to?",
+                        "What is your absolute favorite body part of mine to worship?",
+                        "Have you ever gotten a boner at a completely inappropriate, public place because of me?",
+                        "What is a fantasy you've never dared to share with anyone else until now?",
+                        "Do you like when I pull your hair or choke you lightly?",
+                        "Have you ever watched porn imagining it was us?",
+                        "What is the most expensive or crazy thing you'd do just to spend one night with me?",
+                        "Do you prefer lights fully on so you can see everything, or pitch dark?",
+                        "What is a dirty nickname you want me to call you?",
+                        "Have you ever wanted to try a threesome or sharing fantasies?",
+                        "What is the longest you've ever gone thinking about sex all day long?",
+                        "Do you like when I talk dirty before we even touch?",
+                        "Have you ever bit your lip at work or college thinking about our last chat?",
+                        "What is the boldest text message you've ever sent to anyone?",
+                        "Would you let me control your orgasms completely for a whole week?",
+                        "What is something you've seen in a movie that you desperately want us to recreate?",
+                        "Do you like slow, teasing build-ups or fast, aggressive quickies?",
+                        "What is the most embarrassing turn-on you have?",
+                        "Have you ever masturbated more than three times in a single day?",
+                        "What is a boundary you have that you might want me to help you cross?",
+                        "Do you love when I take charge immediately when we meet?",
+                        "What is the naughtiest secret from your past you haven't told me yet?",
+                        "How often do you think about intimacy during your daily work hours?",
+                        "What is the most sensual gift you've ever wanted to receive from me?",
+                        "Would you let me blindfold you for an entire hour without knowing what I'll do?",
+                        "What is a position you hate doing but pretend to like?",
+                        "Do you like when I scratch your back or leave marks on your skin?",
+                        "What is the sexiest outfit you've ever seen me wear?",
+                        "Have you ever touched yourself thinking about a stranger?",
+                        "What is your ultimate dream scenario for a weekend getaway with me?",
+                        "Do you like dirty talk in English or Roman Hindi/Desi style?",
+                        "What is the most daring thing you've done to get my attention?",
+                        "If you had to choose between oral pleasure or full intercourse for the rest of your life, what's your pick?",
+                        "What is a dirty promise you want me to make to you right now?"
+                    ],
+                    Her: [
+                        "Have you ever fantasized about being taken completely by surprise?",
+                        "What is the wildest thought you've had while touching yourself alone?",
+                        "Which body part of mine do you secretly crave and dream about the most?",
+                        "Have you ever faked an orgasm with me?",
+                        "What’s the dirtiest thing you want me to whisper directly into your ear?",
+                        "If I blindfolded you right now, what’s the very first thing you’d want me to do?",
+                        "Have you ever secretly recorded or wanted to record our private moments?",
+                        "What’s the kinkiest lingerie or outfit you want to wear just for me?",
+                        "Have you ever wanted to dominate me completely and tie me down?",
+                        "Do you secretly love it when I pull your hair during intense intimacy?",
+                        "Have you ever tasted your own flavor or wanted me to taste it off my lips?",
+                        "Would you let me finish on your face or body?",
+                        "Do you want me to spank you harder and leave red marks?",
+                        "What’s the wildest public place you dream about us doing it in?",
+                        "Have you ever touched yourself while pretending I was sleeping right next to you?",
+                        "Do you get instantly turned on when I call you a dirty name?",
+                        "Which toy or object would you want me to use on you during our next night?",
+                        "Have you ever sent explicit pictures to anyone before me?",
+                        "What’s the dirtiest compliment you secretly want me to give you?",
+                        "Have you ever touched yourself thinking about me while I was away?",
+                        "What is a forbidden fantasy you are too shy to act out in person?",
+                        "Do you like when I take complete control of your body without asking?",
+                        "Have you ever bitten your lip hard while reading my text messages in public?",
+                        "Would you let me tie your hands above your head for an entire session?",
+                        "What is the most intense, toe-curling pleasure you've ever experienced with me?",
+                        "Do you prefer slow, gentle foreplay or rough, passionate sex right away?",
+                        "Have you ever wanted me to wake you up in the middle of the night for sex?",
+                        "What is something you want me to do to your body that we've never tried?",
+                        "Do you like when I kiss your neck from behind when you're busy?",
+                        "Have you ever used your fingers or an object while thinking of my voice?",
+                        "What’s the sexiest thing I’ve ever said to you that still makes you wet?",
+                        "Would you let me control your climax and deny you until you beg?",
+                        "What is a dirty secret about your body you've never told anyone?",
+                        "Do you like when I leave visible hickeys on your skin for everyone to see?",
+                        "Have you ever watched adult videos and imagined yourself as the main character?",
+                        "What is the most aggressive you want me to be with you?",
+                        "Do you like when I tell you what to wear and how to act?",
+                        "Have you ever masturbated in the bathroom while guests were at your house?",
+                        "What is a dirty text you wanted to send me today but deleted?",
+                        "Would you strip naked in front of a window if I dared you?",
+                        "What’s your absolute favorite way to initiate intimacy with me?",
+                        "Do you like when I praise you while we are being intimate?",
+                        "Have you ever had a dream about us that made you wake up instantly horny?",
+                        "What is a sound you make in bed that you try to hide?",
+                        "Do you like when I touch you unexpectedly in the kitchen or living room?",
+                        "What is the most daring outfit you'd wear outside if I promised to reward you?",
+                        "Have you ever wanted me to spank you in public where nobody else can see?",
+                        "What is a dirty wish you want me to fulfill before this week ends?",
+                        "Do you love when I worship every inch of your skin slowly?",
+                        "If you could have me do anything to you right now for 30 minutes, what would it be?"
+                    ]
+                },
+                dares: {
+                    Him: [
+                        "Record a 20-second voice note of heavy breathing and deep, hungry groans.",
+                        "Stare into the camera without blinking for 15 seconds while biting your lower lip.",
+                        "Send a mirror photo showing your chest or abs with your shirt half open.",
+                        "Type a continuous 30-second stream of pure dirty talk in the chat without stopping.",
+                        "Record a voice note whispering 'I need to use your body right now' in a rough voice.",
+                        "Take a close-up photo of your hands gripping something tightly and send it.",
+                        "Describe in explicit detail what you'd do to her body if she was in front of you.",
+                        "Send an audio note acting out a dominant roleplay command.",
+                        "Pull your pants down an inch on camera and flash your waistband line.",
+                        "Send a voice note giving her 3 strict dirty orders for the rest of the game.",
+                        "Bite your finger seductively and send a 10-second video clip.",
+                        "Write out a dirty confession statement and make her read it.",
+                        "Record your voice making a deep, raw moaning sound for 10 seconds.",
+                        "Take a photo of your crotch area over your pants/jeans and send it.",
+                        "Send a voice note talking dirty in Roman Hindi with extreme passion.",
+                        "Pinch your own nipple hard on camera for 5 seconds.",
+                        "Send a text describing your exact state of arousal right this second.",
+                        "Record a video saying her name in the most lustful, deep tone possible.",
+                        "Send a photo of your bare feet or legs stretched out on your bed.",
+                        "Give an explicit voice note describing how you'd strip her down piece by piece.",
+                        "Do 15 fast pushups on camera right now and send a video proof.",
+                        "Send a text message detailing how hard you are right now.",
+                        "Record a voice note commanding her to obey your next 3 instructions.",
+                        "Take a selfie biting your thumb while staring lustfully at the lens.",
+                        "Send an audio note whispering the dirtiest thing you've thought about today.",
+                        "Trace your own neck and lips on camera while maintaining heavy eye contact.",
+                        "Send a photo of your bedroom lighting set to dark/moody ambiance.",
+                        "Record a voice note describing your favorite position to use on her.",
+                        "Type out a dirty poem about her body and send it in chat.",
+                        "Send a short video clip rolling your shoulders and flexing your arms.",
+                        "Record an audio message growling softly like you're holding back your urges.",
+                        "Take a photo of your phone screen showing our chat while holding a suggestive pose.",
+                        "Send a voice note telling her what underwear you're wearing.",
+                        "Do a 10-second slow body roll on camera.",
+                        "Send an explicit description of her body parts you want to kiss right now.",
+                        "Record a voice note demanding a picture or voice note reward.",
+                        "Take a photo of your bare torso in dim lighting and send it.",
+                        "Send a text stating the exact number of minutes until you want to see her naked.",
+                        "Record an audio note laughing seductively after saying a dirty word.",
+                        "Send a video clip winking slowly while biting your bottom lip.",
+                        "Type a dirty command and force her to reply with 'Yes Sir'.",
+                        "Send a voice note acting out a jealous, possessive partner scenario.",
+                        "Take a close-up photo of your jawline and neck with slight stubble.",
+                        "Send an audio note whispering 'You're mine' 5 times slowly.",
+                        "Record a 15-second video showing your hands tied or restrained behind your back.",
+                        "Send a text detailing how you'd handle her if she disobeyed you.",
+                        "Record a voice note giving a graphic description of your last climax.",
+                        "Take a photo of your bed sheets all rumpled up and send it.",
+                        "Send an explicit audio note promising a specific punishment or reward.",
+                        "Record a video saying 'Please' in a desperate, needy tone."
+                    ],
+                    Her: [
+                        "Record a 20-second voice note of soft, breathy, desperate moans.",
+                        "Bite your lower lip hard on camera and send a close-up picture of your face.",
+                        "Send a mirror selfie lifting your top slightly to show a hint of your waist.",
+                        "Type a continuous 30-second stream of dirty text without stopping.",
+                        "Record a voice note whispering 'I want you inside me' in a wet, soft tone.",
+                        "Take a close-up photo of your collarbone and neck with your fingers resting on it.",
+                        "Describe in explicit detail how you'd ride him if he was in front of you.",
+                        "Send an audio note acting out a submissive roleplay introduction.",
+                        "Pull your top down slightly to reveal your cleavage on camera.",
+                        "Send a voice note begging him to come over and take control of your body.",
+                        "Touch your own chest seductively and send a 10-second video clip.",
+                        "Write out a dirty confession statement and make him read it.",
+                        "Record your voice making an authentic, loud moaning sound for 10 seconds.",
+                        "Take a photo of your thighs pressed together in shorts or underwear and send it.",
+                        "Send a voice note talking dirty in Roman Hindi with soft, breathless pauses.",
+                        "Pinch your own nipple through your shirt on camera for 5 seconds.",
+                        "Send a text describing how wet you are right this very second.",
+                        "Record a video saying his name in the most needy, high-pitch moan possible.",
+                        "Take a photo of your bare feet or legs curled up on your bed.",
+                        "Give an explicit voice note describing how you'd strip him down with your teeth.",
+                        "Do a seductive hip roll on camera for 15 seconds and send a video proof.",
+                        "Send a text message detailing how much you ache for his touch.",
+                        "Record a voice note begging him to punish you for being a bad girl.",
+                        "Take a selfie biting your finger while looking up through your lashes.",
+                        "Send an audio note whispering the dirtiest thing you've imagined doing to him.",
+                        "Trace your own collarbone and lips on camera while maintaining heavy eye contact.",
+                        "Send a photo of your room with dimmed lights ready for a late-night chat.",
+                        "Record a voice note describing your favorite way to receive oral pleasure.",
+                        "Type out a dirty paragraph about his body and send it in chat.",
+                        "Send a short video clip playing with your hair and giving a sleepy, lustful look.",
+                        "Record an audio message panting softly like you just ran out of breath.",
+                        "Take a photo of your phone screen with your lipstick/lip-gloss mark on it.",
+                        "Send a voice note telling him whether you're wearing panties or going commando.",
+                        "Do a 10-second slow hair flip and look directly into the camera lens with desire.",
+                        "Send an explicit description of his body parts you want to taste right now.",
+                        "Record a voice note demanding a picture or audio reward from him.",
+                        "Take a photo of your collarbone in dim lighting and send it.",
+                        "Send a text stating how many hours you've spent thinking about his hands on you.",
+                        "Record an audio note giggling wickedly after saying something extremely filthy.",
+                        "Send a video clip biting your tongue slowly while giving a teasing smile.",
+                        "Type a dirty command and force him to reply with 'Yes Queen'.",
+                        "Send a voice note acting out a needy, clingy girlfriend scenario.",
+                        "Take a close-up photo of your lips with glossy lipstick or lip balm.",
+                        "Send an audio note whispering 'I need you' 5 times with increasing intensity.",
+                        "Record a 15-second video showing your legs crossed seductively.",
+                        "Send a text detailing how you'd beg him if he refused to touch you.",
+                        "Record a voice note giving a graphic description of how wet your body gets for him.",
+                        "Take a photo of your pillows arranged for sleeping and send it.",
+                        "Send an explicit audio note promising a naughty reward for his next win.",
+                        "Record a video whispering 'You're my daddy' in a soft, trembling voice."
+                    ]
+                }
             },
-            // Temptation (Distraction) — key = distractor name used in distractionTasks
-            distraction: {},
-            // Sensory Blindfold — flat list of punishments
-            blindfold: [],
-            // Lip Lust — rewards/punishments per guesser ("Him" / "Her")
-            lipRewards: { Him: [], Her: [] },
-            lipPunishments: { Him: [], Her: [] },
-            // Squeeze Lick Suck — replace the word-combo pools + jackpot list
+
+            // 2. NEVER HAVE I EVER (NHIE) - 50 Statements
+            nhie: [
+                "Never have I ever masturbated while on an active video or phone call with you.",
+                "Never have I ever saved a risky, explicit screenshot of you without letting you know.",
+                "Never have I ever faked being asleep just to stay wrapped up in my own dirty thoughts about you.",
+                "Never have I ever used a toy or myself while reading our old spicy text messages.",
+                "Never have I ever wished my mic was muted because my moans were getting too loud during our chat.",
+                "Never have I ever worn something exceptionally revealing or gone commando just to tease you on a call.",
+                "Never have I ever searched for adult content that matches our specific secret fantasies.",
+                "Never have I ever wanted to bite you so hard during a make-out session that it leaves a deep mark.",
+                "Never have I ever stared at my phone screen and kissed it because I missed your face so badly.",
+                "Never have I ever lied about being tired just so I could go take care of my urges alone.",
+                "Never have I ever touched myself while thinking about our very first kiss.",
+                "Never have I ever wanted to skip work or college entirely just to spend the day naked with you.",
+                "Never have I ever looked at random people in public and imagined what they look like without clothes.",
+                "Never have I ever had a dream about us that made me wake up physically aching for you.",
+                "Never have I ever sent a text message to you while sitting right next to other people, pretending to be normal.",
+                "Never have I ever hidden a hickey or a scratch mark from my family or friends.",
+                "Never have I ever wanted to pull your hair or pin you down the moment you walked through a door.",
+                "Never have I ever pretended to be angry just so we could have a passionate makeup session later.",
+                "Never have I ever wished we could record a private video together.",
+                "Never have I ever read a dirty romance novel or watched an adult clip and imagined us as the actors.",
+                "Never have I ever whispered something extremely vulgar in public just to see your reaction.",
+                "Never have I ever touched myself in a moving car or vehicle.",
+                "Never have I ever wanted you to dominate me so thoroughly that I couldn't move afterwards.",
+                "Never have I ever kept my eyes wide open during a kiss just to watch your facial expression.",
+                "Never have I ever felt extremely jealous thinking about anyone else looking at your body.",
+                "Never have I ever used food like chocolate or ice cream during intimate exploration.",
+                "Never have I ever wanted to bite your lower lip until it bled slightly.",
+                "Never have I ever taken off all my clothes in an empty house just to feel the air on my skin.",
+                "Never have I ever wished you would surprise me at my doorstep in the middle of the night.",
+                "Never have I ever thought about having a quickie in a public restroom or fitting room.",
+                "Never have I ever looked at your lips while you were talking and completely lost track of what you were saying.",
+                "Never have I ever imagined what your voice sounds like when you're completely losing control.",
+                "Never have I ever wanted to blindfold you and control every sensation you felt.",
+                "Never have I ever masturbated to the thought of you dominating me.",
+                "Never have I ever saved a voice note of yours just to replay it when I miss you too much.",
+                "Never have I ever wanted to worship every single inch of your body from head to toe.",
+                "Never have I ever pretended not to notice when you were checking me out.",
+                "Never have I ever had explicit thoughts about you while sitting in a classroom or office meeting.",
+                "Never have I ever wanted to mark your neck so badly that everyone would know you're taken.",
+                "Never have I ever imagined us running away to a secluded hotel room for an entire weekend.",
+                "Never have I ever bitten my fingernails or lips waiting for your reply to a naughty text.",
+                "Never have I ever wanted to taste you right after you woke up in the morning.",
+                "Never have I ever practiced a seductive look or pose in the mirror before calling you.",
+                "Never have I ever felt a shiver down my spine just from a single word you typed.",
+                "Never have I ever wanted to rip your clothes off with my bare hands.",
+                "Never have I ever fantasized about a complete stranger staring at us while we kiss.",
+                "Never have I ever wanted you to spank me hard enough to sting for hours.",
+                "Never have I ever kept a secret fantasy locked away because I thought you'd think it's too weird.",
+                "Never have I ever wanted to trace every line of your body with my tongue.",
+                "Never have I ever felt completely addicted to the sound of your breathing."
+            ],
+
+            // 3. MEMORY MATCH - 50 Rewards
+            memoryRewards: {
+                Him: [
+                    "🏆 REWARD: She records a 30-second explicit audio tease whispering dirty promises just for your ears.",
+                    "🏆 REWARD: She sends an unreleased, highly private photo drop within 5 minutes.",
+                    "🏆 REWARD: She grants you 3 direct text commands that she must answer with absolute truth.",
+                    "🏆 REWARD: She sends a short video clip blowing you a flying kiss wearing nothing underneath.",
+                    "🏆 REWARD: She writes a full descriptive paragraph of how she'd strip for you tonight.",
+                    "🏆 REWARD: She answers any filthy question you choose with zero hesitation.",
+                    "🏆 REWARD: She records a voice note moaning your name softly 5 times.",
+                    "🏆 REWARD: She sends a mirror photo of her legs or waistline.",
+                    "🏆 REWARD: She promises to obey your next chat command without arguing.",
+                    "🏆 REWARD: She sends a voice note describing what underwear she's currently wearing.",
+                    "🏆 REWARD: She sends a selfie winking at you with wet hair.",
+                    "🏆 REWARD: She writes a 3-step naughty blueprint for your next date.",
+                    "🏆 REWARD: She records a voice note confessing what turned her on most today.",
+                    "🏆 REWARD: She sends a close-up photo of her lips with fresh gloss.",
+                    "🏆 REWARD: She promises to send you a good morning naked snap tomorrow.",
+                    "🏆 REWARD: She records an audio clip telling you how much she misses your hands.",
+                    "🏆 REWARD: She sends a photo of her outfit for the day with a naughty caption.",
+                    "🏆 REWARD: She answers a 'Would You Rather' question with absolute filth.",
+                    "🏆 REWARD: She records a voice note saying 'You're my master' softly.",
+                    "🏆 REWARD: She sends a picture of a random item and tells you how she'd use it on you.",
+                    "🏆 REWARD: She records a 20-second audio clip panting your name.",
+                    "🏆 REWARD: She sends a cute yet seductive meme about couples.",
+                    "🏆 REWARD: She grants you permission to pick her next profile picture.",
+                    "🏆 REWARD: She records a voice note describing her dream setup for us.",
+                    "🏆 REWARD: She sends a photo of her pillow where she wishes you were sleeping.",
+                    "🏆 REWARD: She writes down a secret fantasy in chat and deletes it after 10s.",
+                    "🏆 REWARD: She records an audio note laughing seductively at your joke.",
+                    "🏆 REWARD: She sends a selfie holding a sign with your name and a heart.",
+                    "🏆 REWARD: She promises to stay on a late-night phone call with you until you fall asleep.",
+                    "🏆 REWARD: She sends a voice note whispering 'Hurry up and come home to me.'",
+                    "🏆 REWARD: She sends a photo of her bare shoulders in warm lighting.",
+                    "🏆 REWARD: She records an audio clip reading a sexy sentence you choose.",
+                    "🏆 REWARD: She sends a screenshot of the song playing that reminds her of your touch.",
+                    "🏆 REWARD: She grants you immunity from the next punishment round.",
+                    "🏆 REWARD: She sends a voice note telling you what she'd cook for you while naked.",
+                    "🏆 REWARD: She sends a photo focusing on her eyes looking mischievous.",
+                    "🏆 REWARD: She records a voice note describing the exact texture of your skin.",
+                    "🏆 REWARD: She sends a cute sticker combined with a very dirty text.",
+                    "🏆 REWARD: She promises to text you something illegal/naughty during your work hours.",
+                    "🏆 REWARD: She records an audio clip letting out a long, happy sigh thinking of you.",
+                    "🏆 REWARD: She sends a photo of her coffee/tea mug with a playful note.",
+                    "🏆 REWARD: She records a voice note saying 'You own me completely.'",
+                    "🏆 REWARD: She sends a picture of the view outside her window wishing you were there.",
+                    "🏆 REWARD: She records an audio clip whispering 'I want you right now.'",
+                    "🏆 REWARD: She sends a selfie blowing smoke or sipping a drink.",
+                    "🏆 REWARD: She grants you a 'Veto Power' to cancel any dare she gives you.",
+                    "🏆 REWARD: She records a voice note describing her favorite memory of us kissing.",
+                    "🏆 REWARD: She sends a photo of her hands resting on her lap.",
+                    "🏆 REWARD: She records an audio clip promising a wild surprise on the weekend.",
+                    "🏆 REWARD: She sends a final ultimate reward text locking in a future prize."
+                ],
+                Her: [
+                    "🏆 REWARD: He sends a deep, commanding voice note explaining how he plans to worship your body next.",
+                    "🏆 REWARD: He records a custom video tease following your exact guidelines.",
+                    "🏆 REWARD: He gives you an absolute 'Free Pass' to order him around via chat for the next hour.",
+                    "🏆 REWARD: He sends an explicit audio description of what he'd do to you right now.",
+                    "🏆 REWARD: He drops a shirtless or toned muscle picture in chat.",
+                    "🏆 REWARD: He sends a voice note telling you how much he aches to hold you.",
+                    "🏆 REWARD: He answers any dirty scenario you throw at him with full detail.",
+                    "🏆 REWARD: He promises to let you control the pace of your next game/chat session.",
+                    "🏆 REWARD: He sends an audio clip growling your name in a heavy, raspy voice.",
+                    "🏆 REWARD: He writes a dirty poem dedicated entirely to your body.",
+                    "🏆 REWARD: He sends a video flexing his arms and biting his lip.",
+                    "🏆 REWARD: He records a voice note commanding you to rest while he takes care of you.",
+                    "🏆 REWARD: He sends a close-up picture of his jawline and neck.",
+                    "🏆 REWARD: He promises to send you a good morning voice note tomorrow.",
+                    "🏆 REWARD: He records an audio clip telling you how proud he is to call you his.",
+                    "🏆 REWARD: He sends a photo of his outfit for the day with a protective note.",
+                    "🏆 REWARD: He answers a 'Would You Rather' question with complete honesty.",
+                    "🏆 REWARD: He records a voice note whispering 'You're my queen' softly.",
+                    "🏆 REWARD: He sends a picture of his workspace telling you he's distracted by you.",
+                    "🏆 REWARD: He records a 20-second audio clip panting your name.",
+                    "🏆 REWARD: He sends a funny yet loving couple meme.",
+                    "🏆 REWARD: He grants you permission to change his phone wallpaper to your favorite photo.",
+                    "🏆 REWARD: He records a voice note describing his dream home setup for us.",
+                    "🏆 REWARD: He sends a photo of his side of the bed missing you.",
+                    "🏆 REWARD: He writes down a secret protective promise for you.",
+                    "🏆 REWARD: He records an audio clip laughing warmly at your voice.",
+                    "🏆 REWARD: He sends a selfie holding a coffee mug with a sleepy smile.",
+                    "🏆 REWARD: He promises to stay on a late-night call until you drop off to sleep.",
+                    "🏆 REWARD: He sends a voice note whispering 'I'm coming to get you soon.'",
+                    "🏆 REWARD: He sends a photo of his bare shoulders under sunlight.",
+                    "🏆 REWARD: He records an audio clip reading a romantic passage you pick.",
+                    "🏆 REWARD: He sends a screenshot of the track he's playing dedicated to you.",
+                    "🏆 REWARD: He grants you total immunity from his next challenge.",
+                    "🏆 REWARD: He sends a voice note describing how he'd protect you from the world.",
+                    "🏆 REWARD: He sends a photo focusing on his intense gaze.",
+                    "🏆 REWARD: He records a voice note describing the strength of his arms around you.",
+                    "🏆 REWARD: He sends a comforting sticker combined with a dirty text.",
+                    "🏆 REWARD: He promises to text you something sweet and dirty during your morning routine.",
+                    "🏆 REWARD: He records an audio clip letting out a deep sigh of relief hearing you.",
+                    "🏆 REWARD: He sends a photo of his meal telling you he wishes you shared it.",
+                    "🏆 REWARD: He records a voice note saying 'You are completely safe with me.'",
+                    "🏆 REWARD: He sends a picture of the sky telling you you're under the same stars.",
+                    "🏆 REWARD: He records an audio clip whispering 'I adore you.'",
+                    "🏆 REWARD: He sends a selfie wearing his favorite jacket.",
+                    "🏆 REWARD: He grants you a 'Free Command' card to use whenever you want.",
+                    "🏆 REWARD: He records a voice note describing the very first time he fell for you.",
+                    "🏆 REWARD: He sends a photo of his hands ready to hold yours.",
+                    "🏆 REWARD: He records an audio clip promising an unforgettable date night.",
+                    "🏆 REWARD: He sends a final ultimate reward text locking in your crown."
+                ]
+            },
+
+            // 4. MONOPOLY - 50 Board Tasks
+            monopolyTiles: [
+                "Send a 10-second voice note whispering how desperately you want my touch.",
+                "Take a close-up photo of your lips biting down seductively and send it.",
+                "Write a 4-line explicit poem about your partner's body right now in the chat.",
+                "Issue a strict dirty command that your partner must follow for the next 3 rounds.",
+                "Send an audio note acting out a naughty roleplay introduction.",
+                "Type out your most forbidden fantasy in full, unedited detail in the chat.",
+                "Send a voice note panting heavily like you just ran up a flight of stairs.",
+                "Take a photo of your hand gripping your thigh or chest and send it.",
+                "Send a text detailing the exact hickey you'd give your partner right now.",
+                "Record a voice note saying 'You are my property' in a deep, dark voice.",
+                "Send a selfie making a super aggressive, lustful face at the camera.",
+                "Type out a 5-step instruction list for how your partner should undress for you.",
+                "Send a voice note whispering a filthy promise about your next meetup.",
+                "Take a photo of your collarbone in dark lighting and send it immediately.",
+                "Send an audio clip making soft, breathless whimpering noises.",
+                "Type the most humiliating or funny dirty confession you can think of.",
+                "Send a voice note acting out an angry lover demanding immediate attention.",
+                "Take a close-up picture of your fingers resting on your lower lip.",
+                "Send a text describing what color underwear your partner wore last time.",
+                "Record a voice note reciting a dirty pick-up line with complete seriousness.",
+                "Send a photo showing a tight fist or a scratch pose on your arm.",
+                "Type a 3-word sentence that instantly turns your partner on.",
+                "Send a voice note counting down from 10 to 1 in a progressively sexier voice.",
+                "Take a photo of your bare feet crossed or stretched out.",
+                "Send an audio clip whispering 'I want to ruin you' into the mic.",
+                "Type out a detailed description of how you'd pin your partner against a wall.",
+                "Send a voice note letting out a long, satisfied, after-sex style sigh.",
+                "Take a close-up photo of your eyes looking up through your lashes.",
+                "Send a text stating what percentage horny you are right now (0 to 100).",
+                "Record a voice note imitating a helpless, desperate lover begging for a kiss.",
+                "Send a photo of your room door locked from the inside.",
+                "Type out a dirty nickname and explain why it fits your partner.",
+                "Send a voice note whispering 'Don't make me wait' repeatedly.",
+                "Take a photo of your reflection in a dark window or mirror.",
+                "Send an audio clip giving a fake, exaggerated pornographic gasp.",
+                "Type out a harsh, dominant command that must be followed instantly.",
+                "Send a voice note humming a seductive tune slowly.",
+                "Take a close-up picture of your tongue pressed against your inner cheek.",
+                "Send a text describing the scent of your partner's skin.",
+                "Record a voice note saying 'You're driving me insane' with raw emotion.",
+                "Send a photo of a dark hallway or corner in your house.",
+                "Type out a 2-sentence story about a secret hookup in a public place.",
+                "Send a voice note whispering a threat of how hard you'll kiss them.",
+                "Take a photo of your palm open facing the camera like a stop sign.",
+                "Send an audio clip letting out a low, gravelly chuckle.",
+                "Type out a list of 3 things you want to bite on your partner's body.",
+                "Send a voice note whispering 'Strip for me' right now.",
+                "Take a close-up photo of your chest or abs in shadow.",
+                "Send a text outlining the punishment for losing the next round.",
+                "Record a voice note whispering 'Good boy/girl' in a deep, praising tone."
+            ],
+
+            // 5. SPICE & DICE - 50 Actions, 50 Body Parts, 50 Durations, Massive Jackpots
             sls: {
-                actions: [],
-                bodyParts: [],
-                durations: [],
-                jackpots: { Mutual: [], Him: [], Her: [] }
+                actions: [
+                    "SEDUCTIVE TEXT 💬", "VOICE NOTE MOAN 🔊", "PHOTO TEASE 📸", 
+                    "DIRTY WHISPER AUDIO 🗣️", "HEAVY BREATHING VN 🌬️", "COMMAND TEXT 👑",
+                    "BITING TEASE 🦷", "SLOW BURN TEXT 🔥", "GRAPHIC CONFESSION 📝",
+                    "PANTING AUDIO 🥵", "SKIN TRACE PHOTO 📸", "DIRTY PROMISE 🤞",
+                    "DOMINANT ORDER ⚡", "SUBMISSIVE PLEA 🥺", "EXPLICIT TEXT 📜",
+                    "MOAN BATTLE AUDIO 🎶", "CLOSE-UP SHOT 📷", "DIRTY ROAST 🔥",
+                    "FANTASY PITCH 🎬", "URGENT DEMAND ⏰", "BREATHLESS WHISPER 💨",
+                    "TEASE DROP 💧", "INTENSE STARE 👀", "BEDROOM SCRIPT 📖",
+                    "RAW CONFESSION 🗝️", "LUSTFUL NOTE 🎵", "SUGGESTIVE POSE 💃",
+                    "SEXY COUNTDOWN ⏱️", "VERBAL TRAP 🪤", "SLAVERY PLEDGE 📜",
+                    "BEDROOM DARE 🎯", "VOICE COMMAND 🎙️", "TEXT TEASE 📲",
+                    "PICTURE DROP 🖼️", "AUDIO DROP 🎧", "LUST STATEMENT 💬",
+                    "EXPLICIT PROMPT ⚡", "HOT FLASH 🔥", "SEXY WHISPER 🤫",
+                    "WILD CONFESSION 💭", "TEASE COMMAND 🛑", "BITE THREAT 🦷",
+                    "MOAN CHALLENGE 📢", "DIRTY RIDDLE 🧩", "TEMPTATION TEXT 💌",
+                    "URGENT AUDIO 🚨", "FLESH TEXT ✒️", "DESIRE DROP 🩸",
+                    "PLEASURE PLEDGE 💍", "WILD PROMISE ✨"
+                ],
+                bodyParts: [
+                    "Your Own Lips", "The Camera Lens", "Your Neck (Photo)", 
+                    "Your Collarbone", "Your Inner Thigh (Photo)", "Your Fingers",
+                    "Your Lower Waist", "Your Bare Chest", "Your Back Arch",
+                    "Your Lips (Close-up)", "Your Nape", "Your Jawline",
+                    "Your Shoulders", "Your Thigh Line", "Your Waistband",
+                    "Your Fingertips", "Your Hair Strands", "Your Abs / Stomach",
+                    "Your Ear Lobe (Photo)", "Your Skin in Shadow", "Your Knees",
+                    "Your Palms", "Your Forearms", "Your Foot Arch",
+                    "Your Hip Bone", "Your Lower Back", "Your Ribcage Line",
+                    "Your Skin under Light", "Your Tongue (Quick Photo)", "Your Chest Shadow",
+                    "Your Eyelids", "Your Nose Tip", "Your Chin Line",
+                    "Your Throat Hollow", "Your Shoulder Blade", "Your Knuckles",
+                    "Your Elbow Pit", "Your Belly Button", "Your Upper Arm",
+                    "Your Calf Muscle", "Your Achilles Tendon", "Your Palm Lines",
+                    "Your Fingernails", "Your Cheekbone", "Your Temple",
+                    "Your Eyebrows", "Your Side Waist", "Your Lower Tummy",
+                    "Your Skin Surface", "Your Pores (Macro)"
+                ],
+                durations: [
+                    "Send within 30 Seconds", "1 Minute Audio", "Hard & Heavy Text", 
+                    "Without breaking character", "While chatting dirty", "In Slow Motion",
+                    "With heavy breathing", "In a single breath", "While biting your lower lip",
+                    "With eyes closed", "In a dark room", "With maximum aggression",
+                    "In a soft, whispering tone", "While holding your breath", "Repeated 3 times",
+                    "Like you're about to explode", "With intense eye contact", "In a dominant command voice",
+                    "As slow as humanly possible", "While shivering slightly",
+                    "For 15 seconds straight", "Until your partner replies", "Without blinking",
+                    "In your deepest voice", "In your highest breathy tone", "While tapping your finger",
+                    "With a wicked smile", "While touching your own hair", "Facing the wall first",
+                    "With total seriousness", "In a mocking, flirty tone", "Like a secret agent",
+                    "Under strict orders", "Before the timer runs out", "With maximum passion",
+                    "Like a late-night radio host", "With a trembling voice", "While pacing around",
+                    "With your eyes half-closed", "Like your life depends on it",
+                    "In a fast whisper", "With a dramatic pause", "Like a confession",
+                    "With a naughty wink", "Before counting to five", "While biting a pen/finger",
+                    "In a melodic tone", "With heavy sighs", "Like a spell", "Instantly"
+                ],
+                jackpots: {
+                    Mutual: [
+                        "🔥 ONLINE JACKPOT: Exchange 3 explicit photos/videos back and forth right now.",
+                        "🔥 ONLINE JACKPOT: 5-Minute Unfiltered Text and Audio Sex Session.",
+                        "🔥 ONLINE JACKPOT: Mutual Voice Note Moan Battle until someone yields.",
+                        "🔥 ONLINE JACKPOT: Live virtual striptease via video/photo drop.",
+                        "🔥 ONLINE JACKPOT: Simultaneous dirty confession exchange with zero filters.",
+                        "🔥 ONLINE JACKPOT: 10-minute continuous explicit roleplay script battle.",
+                        "🔥 ONLINE JACKPOT: Mutual audio recording of heavy breathing and moans."
+                    ],
+                    Him: [
+                        "🔥 ONLINE JACKPOT: She sends a custom photo/video drop tailored just for you.",
+                        "🔥 ONLINE JACKPOT: She records a dedicated audio tease for your ears only.",
+                        "🔥 ONLINE JACKPOT: She answers any 3 questions you have with absolute graphic truth.",
+                        "🔥 ONLINE JACKPOT: She grants you 5 minutes of supreme chat domination.",
+                        "🔥 ONLINE JACKPOT: She records a voice note calling you by your favorite dirty title."
+                    ],
+                    Her: [
+                        "🔥 ONLINE JACKPOT: He sends an intense dirty voice note describing your body piece by piece.",
+                        "🔥 ONLINE JACKPOT: He obeys 3 immediate chat commands via text without hesitation.",
+                        "🔥 ONLINE JACKPOT: He writes a 500-word explicit fantasy story starring the two of you.",
+                        "🔥 ONLINE JACKPOT: He records a raw, heavy-breathing audio confession just for you.",
+                        "🔥 ONLINE JACKPOT: He gives you an unconditional digital 'Queen Pass' for the day."
+                    ]
+                }
+            },
+
+            // 6. LUST BOMB - 50 Tasks & 50 Punishments
+            bomb: {
+                tasks: [
+                    "Quick! Type your partner's absolute favorite body part in the chat!",
+                    "Send a 5-second audio note giving a realistic, loud moan right now!",
+                    "Take a quick selfie biting your lower lip and drop it in chat!",
+                    "Type 'I am completely yours' in all caps right now!",
+                    "Send a voice note saying 'Make me beg for it'!",
+                    "Drop the dirtiest emoji combination in chat instantly!",
+                    "Text a 5-word explicit confession right this second!",
+                    "Quick! Type what color underwear you have on right now!",
+                    "Send a voice note growling 'Come here' into the mic!",
+                    "Take a photo of your hand making a claw shape and send it!",
+                    "Type the name of the last adult thought you had!",
+                    "Send an audio clip saying 'You're driving me crazy' fast!",
+                    "Quick! Type out 3 dirty words separated by commas!",
+                    "Send a voice note whispering 'Touch me' immediately!",
+                    "Take a photo of your phone keyboard while typing a dirty word!",
+                    "Quick! Type 'Harder' 5 times in chat!",
+                    "Send a voice note panting for 3 seconds!",
+                    "Take a selfie closing your eyes like you're kissing!",
+                    "Quick! Type your partner's pet name in caps!",
+                    "Send an audio note making a sharp intake of breath like you're shocked!",
+                    "Quick! Type your favorite sex position right now!",
+                    "Send a voice note saying 'Please' softly!",
+                    "Take a photo of your feet on the floor and send it!",
+                    "Quick! Type the number of times you thought of me today!",
+                    "Send an audio clip saying 'Ow' like you're being bitten!",
+                    "Quick! Type 'Bad boy/girl' in chat!",
+                    "Send a voice note laughing wickedly!",
+                    "Take a photo of your ceiling and send it!",
+                    "Quick! Type the first letter of your partner's name 3 times!",
+                    "Send an audio note blowing a raspberry sound!",
+                    "Quick! Type 'Spank me' in chat!",
+                    "Send a voice note saying 'Hurry up'!",
+                    "Take a photo of a dark wall and send it!",
+                    "Quick! Type your current body temperature vibe (Hot/Freezing)!",
+                    "Send an audio note whispering 'Mine'!",
+                    "Quick! Type 'Yes Master/Queen'!",
+                    "Send a voice note saying 'Stop teasing'!",
+                    "Take a photo of your thumb up close!",
+                    "Quick! Type 'Open wide'!",
+                    "Send an audio note groaning softly!",
+                    "Quick! Type 'Deeper' in chat!",
+                    "Send a voice note saying 'I surrender'!",
+                    "Take a photo of your water glass or cup!",
+                    "Quick! Type 'Faster' in caps!",
+                    "Send an audio note panting like a puppy!",
+                    "Quick! Type 'No clothes' in chat!",
+                    "Send a voice note saying 'Bite me'!",
+                    "Take a photo of your closed fist!",
+                    "Quick! Type 'Take it all'!",
+                    "Send an audio note letting out a tiny squeak!"
+                ],
+                punishments: [
+                    "☠️ Send a voice note apologizing to your partner in a submissive, obedient voice.",
+                    "☠️ Send a screenshot of your most recent search history tab.",
+                    "☠️ Post a risky text chosen by your partner as your status for 10 minutes.",
+                    "☠️ Send a 30-second audio note describing a dirty punishment you willingly accept.",
+                    "☠️ Hand over control of your next 3 game choices entirely to your partner.",
+                    "☠️ Send a voice note begging for mercy in a high-pitched, dramatic tone.",
+                    "☠️ Take a photo of yourself facing the wall (timeout pose) and send it.",
+                    "☠️ Type out a 50-word apology letter in chat for losing the bomb round.",
+                    "☠️ Send an audio note singing a dirty song chosen by your partner.",
+                    "☠️ Surrender your right to speak normally for the next 5 turns.",
+                    "☠️ Send a voice note whispering 'I am a failure' in a funny mock-sad voice.",
+                    "☠️ Take a photo of your shoes upside down and send it.",
+                    "☠️ Type out 3 things you will do to make up for losing.",
+                    "☠️ Send an audio note imitating an angry cartoon character.",
+                    "☠️ Surrender your phone gallery control for 1 minute of scrolling.",
+                    "☠️ Send a voice note confessing a silly fear you have.",
+                    "☠️ Take a photo of a dark corner in your room.",
+                    "☠️ Type out a 30-word tribute praising your partner's superiority.",
+                    "☠️ Send an audio note making weird robot noises for 10 seconds.",
+                    "☠️ Surrender your next 2 rewards to your partner."
+                ]
+            },
+
+            // 7. PANDORA'S BOX - Massive Chests
+            pandora: {
+                Him: {
+                    Devil: [
+                        "😈 DEVIL: Send a voice note begging for release while your partner completely denies you.",
+                        "😈 DEVIL: Do 20 pushups on camera right now and send a video proof.",
+                        "😈 DEVIL: Hand over full control of your chat window to her for the next 10 minutes.",
+                        "😈 DEVIL: Send a photo showing your frustration and impatience on camera.",
+                        "😈 DEVIL: Send an audio note admitting defeat in a humiliating tone.",
+                        "😈 DEVIL: Mute your mic/chat for 15 minutes while she sends taunting texts.",
+                        "😈 DEVIL: Type out a confession admitting why you're a bad boy.",
+                        "😈 DEVIL: Send a photo of your workspace or room looking completely messy.",
+                        "😈 DEVIL: Send a voice note panting and stating you are under her command.",
+                        "😈 DEVIL: Type a 100-word paragraph detailing why she is superior to you."
+                    ],
+                    Angel: [
+                        "😇 ANGEL: She sends a custom video teaser clip created exclusively for you.",
+                        "😇 ANGEL: She records an audio note whispering how deeply she craves your touch.",
+                        "😇 ANGEL: Unlock a guaranteed live video call session packed with teasing later tonight.",
+                        "😇 ANGEL: She writes a passionate, highly erotic paragraph praising your body.",
+                        "😇 ANGEL: She grants you an immediate 'Kiss Pass' for your next meeting."
+                    ]
+                },
+                Her: {
+                    Devil: [
+                        "😈 DEVIL: Send a 1-minute audio note filled with heavy, desperate, breathless moans.",
+                        "😈 DEVIL: Send a photo biting your finger in a submissive, eager pose.",
+                        "😈 DEVIL: Obey 2 immediate chat-based commands given by him instantly.",
+                        "😈 DEVIL: Send an audio note crying out in fake agony from being teased.",
+                        "😈 DEVIL: Type out a detailed paragraph explaining your submission rules to him.",
+                        "😈 DEVIL: Send a photo of your hands crossed behind your back in submission.",
+                        "😈 DEVIL: Surrender your right to choose the next game mode.",
+                        "😈 DEVIL: Send a voice note whispering 'I am a disobedient girl' slowly.",
+                        "😈 DEVIL: Type out 3 rules he has set for you that you must follow."
+                    ],
+                    Angel: [
+                        "😇 ANGEL: He sends an intense voice note praising your body and worshiping your skin.",
+                        "😇 ANGEL: He writes a long paragraph of pure, unfiltered dirty devotion dedicated to you.",
+                        "😇 ANGEL: Unlock a free pass to command him however you want on our next meetup.",
+                        "😇 ANGEL: He sends a secret, spontaneous picture drop just for your eyes.",
+                        "😇 ANGEL: He records a sweet, deep voice note promising to spoil you."
+                    ]
+                }
+            },
+
+            // 8. RUSSIAN ROULETTE - Expanded Chambers
+            roulette: {
+                safe: [
+                    "Click! Safe. Reward: Your partner sends a sweet, deeply affectionate voice note compliment.",
+                    "Click! Safe. Reward: Your partner sends a hot, spontaneous selfie.",
+                    "Click! Safe. Reward: Your partner writes a short, incredibly flirty text message.",
+                    "Click! Safe. Reward: You get a free pass to ask one unfiltered dirty question.",
+                    "Click! Safe. Reward: Your partner sends an audio clip blowing you a kiss.",
+                    "Click! Safe. Reward: Your partner sends a voice note listing 3 things they love about you.",
+                    "Click! Safe. Reward: Your partner has to say something sweet in their most seductive voice.",
+                    "Click! Safe. Reward: You get to pick tomorrow's outfit for your partner.",
+                    "Click! Safe. Reward: Your partner sends a video blowing a kiss at the camera.",
+                    "Click! Safe. Reward: Your partner has to text you a cheesy pickup line right now.",
+                    "Click! Safe. Reward: You get a 'Skip Pass' to avoid your next punishment in any game.",
+                    "Click! Safe. Reward: Your partner sends a selfie with their best smile.",
+                    "Click! Safe. Reward: Your partner has to compliment your best feature out loud in a voice note.",
+                    "Click! Safe. Reward: Your partner promises to plan the next date night.",
+                    "Click! Safe. Reward: Your partner sends a voice note singing (badly or well) a line of your favorite song."
+                ],
+                bang: [
+                    "💥 BANG! Send a voice note confessing a deeply hidden secret you've never shared.",
+                    "💥 BANG! Send a photo of yourself making a funny or embarrassing face.",
+                    "💥 BANG! Give your partner absolute control over your next text message response.",
+                    "💥 BANG! Send a 30-second audio note of continuous, heavy moaning.",
+                    "💥 BANG! Type out a full paragraph detailing your most embarrassing turn-on.",
+                    "💥 BANG! Send your partner a screenshot of your last 3 texts to anyone.",
+                    "💥 BANG! Record a 10-second voice note singing the alphabet backwards.",
+                    "💥 BANG! Let your partner post anything they want as your status for 5 minutes.",
+                    "💥 BANG! Send a voice note admitting your most embarrassing childhood memory.",
+                    "💥 BANG! Text your partner using only emojis for the next 3 messages.",
+                    "💥 BANG! Send a photo of your current messy corner of the room.",
+                    "💥 BANG! Record a voice note doing your worst celebrity impression.",
+                    "💥 BANG! Let your partner rename your contact in your phone for the day.",
+                    "💥 BANG! Send a voice note apologizing dramatically for something silly.",
+                    "💥 BANG! Answer your partner's next 2 questions with 100% brutal honesty."
+                ]
+            },
+
+            // 9. RISK IT ALL
+            risk: {
+                safe: [
+                    "Bite your lower lip and stare intensely at the screen for 10 seconds straight.",
+                    "Describe your partner's best physical feature in a low, husky whisper note.",
+                    "Slowly trace your fingers down your own neck on a short video clip.",
+                    "Text your partner the exact dirty thought that just crossed your mind about them.",
+                    "Send a photo focusing on your eyes with a smoldering, direct gaze.",
+                    "Send an audio note whispering 'You're driving me crazy' softly."
+                ],
+                spicy: [
+                    "Send a voice note running your hands up and down your thighs slowly and heavily.",
+                    "Take a mirror selfie adjusting your clothing to reveal a bit more skin.",
+                    "Whisper a deeply personal, graphic fantasy into a private voice note.",
+                    "Send a close-up photo of your lips parted and slightly wet.",
+                    "Send an audio recording of your breathing getting faster and heavier."
+                ],
+                extreme: [
+                    "Send a voice note recording your heaviest, most desperate, unfiltered moans.",
+                    "Send a short video clip showing a very tempting glimpse of your waistline or legs.",
+                    "Send an explicit audio text painting a vivid picture of a dirty scenario you want to act out.",
+                    "Send a direct video proof touching yourself over your clothes for 30 seconds."
+                ]
+            },
+
+            // 10. TEMPTATION (Distraction)
+            distraction: {
+                Him: [
+                    "Send a voice note talking dirty with a deep, heavy, authoritative voice.",
+                    "Text a detailed, graphic description of how you'd strip them down right this second.",
+                    "Send a voice note giving raw, unfiltered commands they must repeat.",
+                    "Text a continuous stream of dirty thoughts while they try to stay focused."
+                ],
+                Her: [
+                    "Send a short video biting your lip and running your hands slowly over your chest.",
+                    "Send a voice note filled with raw, unfiltered, dirty talk.",
+                    "Send an audio clip moaning softly while whispering how much you want them.",
+                    "Text explicit descriptions of what you'd do to their body right now."
+                ]
+            },
+
+            // 11. SENSORY BLINDFOLD
+            blindfold: [
+                "Send a 30-second voice note of your heaviest, most convincing moans as your penalty.",
+                "Record a 15-second video striking an obedient, statuesque pose chosen by your partner.",
+                "Send an audio recording of yourself begging for your partner's mercy.",
+                "Send a photo showing your hands tied or held together in submission."
+            ],
+
+            // 12. LIP LUST
+            lipRewards: {
+                Him: [
+                    "🏆 REWARD: She sends a spicy, highly private voice note designed just for your ears.",
+                    "🏆 REWARD: She sends an unreleased photo drop of her face or lips."
+                ],
+                Her: [
+                    "🏆 REWARD: He talks dirty to you in a heavy, commanding, breathless voice via audio note.",
+                    "🏆 REWARD: He sends an explicit voice note detailing his physical cravings for you."
+                ]
+            },
+            lipPunishments: {
+                Him: [
+                    "☠️ PUNISHMENT: Send a humiliating or super-risky text message chosen entirely by her.",
+                    "☠️ PUNISHMENT: Send a 30-second voice note apologizing in a tiny, submissive voice."
+                ],
+                Her: [
+                    "☠️ PUNISHMENT: Send a 1-minute non-stop audio moan voice note straight to his chat.",
+                    "☠️ PUNISHMENT: Send a screenshot of your most embarrassing recent chat or search history."
+                ]
             }
         };
 
-        // Helper: returns the online override array if it exists and has content,
-        // otherwise falls back to the original array you already had.
+        // Helper: safe pool picker with automatic fallback
         window.pickPool = (onlinePool, fallbackPool) => {
             if (window.state.isMultiplayer && Array.isArray(onlinePool) && onlinePool.length > 0) {
                 return onlinePool;
@@ -2432,6 +3273,20 @@ window.handleReceivedData = (data) => {
             document.getElementById('chat-badge').classList.remove('hidden');
             break;
 
+        case 'CHAT_MEDIA_CHUNK':
+            window._mediaReceiver = window._mediaReceiver || {};
+            const rx = window._mediaReceiver;
+            if (!rx[payload.id]) rx[payload.id] = { type: payload.mediaType, chunks: [], total: payload.total };
+            rx[payload.id].chunks[payload.index] = payload.data;
+            if (rx[payload.id].chunks.filter(Boolean).length === payload.total) {
+                const assembled = rx[payload.id].chunks.join('');
+                const mimeType = rx[payload.id].type;
+                window.appendMediaMessage(assembled, mimeType, 'partner');
+                document.getElementById('chat-badge').classList.remove('hidden');
+                delete rx[payload.id];
+            }
+            break;
+
         // --- 2. TRUTH OR DARE / LUST BOMB / PANDORA ---
         case 'TOD_ACTION':
         case 'BOMB_ACTION':
@@ -2467,23 +3322,23 @@ window.handleReceivedData = (data) => {
 
         // --- 4. RUSSIAN ROULETTE ---
         case 'ROULETTE_INIT':
-            window.rouletteTurn = payload.starter;
-            window.bulletChamber = payload.bullet;
-            window.currentChamber = 1;
+            rouletteTurn = payload.starter;
+            bulletChamber = payload.bullet;
+            currentChamber = 1;
             document.getElementById('roulette-intro').classList.add('hidden');
             document.getElementById('roulette-game').classList.remove('hidden');
             window.updateRouletteUI("Game Started.");
             break;
 
         case 'ROULETTE_TRIGGER':
-            window.currentChamber = payload.chamber;
+            currentChamber = payload.chamber;
             if (payload.result === 'BANG') window.handleRouletteDeath(payload.task);
             else window.handleRouletteSafe(payload.task);
             break;
 
         case 'ROULETTE_NEXT':
-            window.currentChamber = payload.nextChamber;
-            window.rouletteTurn = payload.turn;
+            currentChamber = payload.nextChamber;
+            rouletteTurn = payload.turn;
             document.getElementById('roulette-safe-overlay').classList.add('hidden');
             document.getElementById('btn-trigger').disabled = false;
             break;
@@ -3073,9 +3928,14 @@ function setupConnection(conn) {
             }
 
             const tile = monoMap.find(t => t.id === next);
-            
+            const isMechanicTile = ['START', 'Safe Spot', 'Go Back 2', 'Roll Again'].includes(tile.text);
+            const onlineMonoPool = window.ONLINE_TASKS.monopolyTiles;
+            const tileDetail = (!isMechanicTile && window.state.isMultiplayer && onlineMonoPool && onlineMonoPool.length > 0)
+                ? onlineMonoPool[Math.floor(Math.random() * onlineMonoPool.length)]
+                : tile.detail;
+
             const centerText = document.getElementById('mono-active-desc');
-            if(centerText) centerText.textContent = tile.detail;
+            if(centerText) centerText.textContent = tileDetail;
 
             if(tile.text.includes("Go Back")) {
                 const back = 2;
@@ -4283,7 +5143,12 @@ window.todAction = (type) => {
         return;
     }
 
-    const pool = type === 'Truth' ? todData.truths : todData.dares;
+    const pool = window.pickPool(
+        type === 'Truth'
+            ? [...(window.ONLINE_TASKS.tod?.truths?.Him || []), ...(window.ONLINE_TASKS.tod?.truths?.Her || [])].map(t => ({ text: t }))
+            : [...(window.ONLINE_TASKS.tod?.dares?.Him || []), ...(window.ONLINE_TASKS.tod?.dares?.Her || [])].map(t => ({ text: t })),
+        type === 'Truth' ? todData.truths : todData.dares
+    );
     const item = pool[Math.floor(Math.random() * pool.length)];
     
     document.getElementById('tod-choice-btns').classList.add('hidden');
@@ -4345,11 +5210,10 @@ window.todAction = (type) => {
 
 
 window.initNHIE = () => {
-    if (typeof nhieStatements !== 'undefined' && nhieStatements.length > 0) {
-        window.state.nhie.statements = [...nhieStatements].sort(() => Math.random() - 0.5);
-    } else {
-        window.state.nhie.statements = ["Never have I ever wished you were here right now."];
-    }
+    const onlineNHIE = window.ONLINE_TASKS.nhie || [];
+    const baseNHIE = (typeof nhieStatements !== 'undefined' && nhieStatements.length > 0) ? nhieStatements : ["Never have I ever wished you were here right now."];
+    const finalNHIEPool = window.pickPool(onlineNHIE, baseNHIE);
+    window.state.nhie.statements = [...finalNHIEPool].sort(() => Math.random() - 0.5);
     
     window.state.nhie.currentQ = 0;
     window.state.nhie.himScore = 5;
@@ -4671,7 +5535,10 @@ window.updateNHIEUI = () => {
                 window.state.memory.isLocked = false; 
 
                 const rewardData = memoryRewards[card1.rewardIndex];
-                const rewardText = rewardData[currentTurn.toLowerCase()].reward;
+                const onlineMemPool = window.ONLINE_TASKS.memoryRewards ? window.ONLINE_TASKS.memoryRewards[currentTurn] : null;
+                const rewardText = (window.state.isMultiplayer && onlineMemPool && onlineMemPool.length > 0)
+                    ? onlineMemPool[Math.floor(Math.random() * onlineMemPool.length)]
+                    : rewardData[currentTurn.toLowerCase()].reward;
                 
                 const message = `🎉 Match Found! ${window.state.names[currentTurn]}'s Reward: ${rewardText}`;
                 
@@ -5262,7 +6129,7 @@ window.startBombGame = (isRemote = false, remoteDuration = 0) => {
     timeLeft = duration * 10;
     
     // Pehla Task dikhao
-    document.getElementById('bomb-task-text').textContent = bombTasks[Math.floor(Math.random() * bombTasks.length)];
+    document.getElementById('bomb-task-text').textContent = window.pickPool(window.ONLINE_TASKS.bomb?.tasks, bombTasks)[Math.floor(Math.random() * window.pickPool(window.ONLINE_TASKS.bomb?.tasks, bombTasks).length)];
 
     // Purana timer clear karo taaki double speed na ho
     if(window.bombTimer) clearInterval(window.bombTimer);
@@ -5294,7 +6161,8 @@ window.passTheBomb = (isRemote = false, nextTask = null) => {
     
     // Agar maine button dabaya (Remote nahi hai)
     if (!isRemote) {
-        taskToDisplay = bombTasks[Math.floor(Math.random() * bombTasks.length)];
+        const bombTaskPool = window.pickPool(window.ONLINE_TASKS.bomb?.tasks, bombTasks);
+        taskToDisplay = bombTaskPool[Math.floor(Math.random() * bombTaskPool.length)];
         
         // Partner ko naya task bhejo
         if (window.state.isMultiplayer) {
@@ -5322,7 +6190,8 @@ window.explodeBomb = (isRemote = false, remotePunishment = null) => {
 
     // Agar Local Timer ne trigger kiya hai
     if (!isRemote) {
-        finalPunishment = bombPunishments[Math.floor(Math.random() * bombPunishments.length)];
+        const bombPunishPool = window.pickPool(window.ONLINE_TASKS.bomb?.punishments, bombPunishments);
+        finalPunishment = bombPunishPool[Math.floor(Math.random() * bombPunishPool.length)];
         
         // Partner ko bhejo: "Ye punishment dikhao aur game roko"
         if (window.state.isMultiplayer) {
@@ -6405,11 +7274,11 @@ window.openPandoraBox = (index, cardEl, backEl, item, isRemote = false, remoteTe
         let syncText = "";
         if (item === 'devil') {
             // Devil Tasks list se random pick
-            const list = pandoraData[pandoraTurn].Devil; 
+            const list = window.pickPool(window.ONLINE_TASKS.pandora?.[pandoraTurn]?.Devil, pandoraData[pandoraTurn].Devil);
             syncText = list[Math.floor(Math.random() * list.length)];
         } else if (item === 'angel') {
             // Angel Tasks list se random pick
-            const list = pandoraData[pandoraTurn].Angel;
+            const list = window.pickPool(window.ONLINE_TASKS.pandora?.[pandoraTurn]?.Angel, pandoraData[pandoraTurn].Angel);
             syncText = list[Math.floor(Math.random() * list.length)];
         }
 
@@ -6510,12 +7379,12 @@ window.openPandoraBox = (index, cardEl, backEl, item, isRemote = false, remoteTe
         if (pScore.devil > pScore.angel) {
             finalType = 'devil';
             finalTitle = "HELL UNLEASHED 😈";
-            const list = pandoraData[pandoraTurn].Devil;
+            const list = window.pickPool(window.ONLINE_TASKS.pandora?.[pandoraTurn]?.Devil, pandoraData[pandoraTurn].Devil);
             taskText = list[Math.floor(Math.random() * list.length)];
         } else if (pScore.angel > pScore.devil) {
             finalType = 'angel';
             finalTitle = "PURE BLISS 😇";
-            const list = pandoraData[pandoraTurn].Angel;
+            const list = window.pickPool(window.ONLINE_TASKS.pandora?.[pandoraTurn]?.Angel, pandoraData[pandoraTurn].Angel);
             taskText = list[Math.floor(Math.random() * list.length)];
         } else {
             finalType = 'draw';
@@ -7000,7 +7869,7 @@ window.pullTrigger = () => {
         if (currentChamber === bulletChamber) {
             // --- BANG ---
             result = 'BANG';
-            const list = rouletteDeaths[rouletteTurn];
+            const list = window.pickPool(window.ONLINE_TASKS.roulette?.bang, rouletteDeaths[rouletteTurn]);
             task = list[Math.floor(Math.random() * list.length)];
             
             // Vault Logic (Only Trigger Puller Saves)
@@ -7017,7 +7886,7 @@ window.pullTrigger = () => {
 
         } else {
             // --- SAFE ---
-            const list = roulettePleasures[rouletteTurn];
+            const list = window.pickPool(window.ONLINE_TASKS.roulette?.safe, roulettePleasures[rouletteTurn]);
             task = list[Math.floor(Math.random() * list.length)];
         }
 
@@ -7104,71 +7973,7 @@ window.handleRouletteDeath = (taskText) => {
 // --- MISSING FUNCTIONS END ---
 
 // --- CHAT & STATUS FUNCTIONS ---
-
-// 1. CHAT TOGGLE (Open/Close)
-window.toggleChat = () => {
-    const chatBox = document.getElementById('game-chat-box');
-    const badge = document.getElementById('chat-badge');
-    
-    if (chatBox.classList.contains('hidden')) {
-        chatBox.classList.remove('hidden');
-        // Animation
-        setTimeout(() => {
-            chatBox.classList.remove('opacity-0', 'scale-95');
-        }, 10);
-        badge.classList.add('hidden'); // Message padh liya, badge hatao
-        
-        // Auto focus input
-        document.getElementById('chat-input').focus();
-    } else {
-        chatBox.classList.add('opacity-0', 'scale-95');
-        setTimeout(() => {
-            chatBox.classList.add('hidden');
-        }, 300);
-    }
-};
-
-// 2. SEND MESSAGE
-window.sendChatMessage = () => {
-    const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if (!text) return;
-
-    // Local Display (Right side)
-    appendMessage(text, 'me');
-
-    // Send to Partner
-    if (window.state.isMultiplayer) {
-        sendStateUpdate('CHAT_MSG', { text: text });
-    }
-
-    input.value = '';
-};
-
-// Enter key se send karo
-document.getElementById('chat-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') window.sendChatMessage();
-});
-
-// 3. DISPLAY MESSAGE HELPER - FIXED
-window.appendMessage = (text, sender) => {
-    const container = document.getElementById('chat-messages');
-    const div = document.createElement('div');
-    
-    if (sender === 'me') {
-        div.className = "flex justify-end";
-        div.innerHTML = `<div class="bg-pink-600 text-white px-3 py-2 rounded-l-lg rounded-tr-lg max-w-[80%] shadow-md text-sm">${text}</div>`;
-    } else {
-        div.className = "flex justify-start";
-        div.innerHTML = `<div class="bg-white/20 text-white px-3 py-2 rounded-r-lg rounded-tl-lg max-w-[80%] border border-white/10 shadow-md text-sm">${text}</div>`;
-    }
-    
-    container.appendChild(div);
-    // Scroll to bottom properly
-    setTimeout(() => {
-        container.scrollTop = container.scrollHeight;
-    }, 50);
-};
+// (Handled by E2E Chat Engine at bottom of file)
 
 
 
@@ -8442,44 +9247,8 @@ window.addEventListener('load', () => {
 });
 
     </script>
-<div id="partner-status" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-black/80 border border-pink-500/50 text-white px-4 py-2 rounded-full text-xs font-bold shadow-[0_0_15px_rgba(236,72,153,0.3)] hidden z-50 flex items-center gap-2">
-    <span class="relative flex h-2 w-2">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-    </span>
-    <span id="partner-status-text">Partner Connected</span>
-</div>
 
-<button id="chat-toggle-btn" onclick="toggleChat()" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-pink-600 to-purple-700 rounded-full shadow-[0_0_20px_rgba(236,72,153,0.6)] flex items-center justify-center z-50 hidden transition-transform active:scale-95">
-    <i data-lucide="message-circle" class="text-white w-7 h-7"></i>
-    <span id="chat-badge" class="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-[#1a0505] hidden"></span>
-</button>
 
-<div id="game-chat-box" class="fixed bottom-24 right-6 w-72 h-80 bg-black/90 border border-white/20 backdrop-blur-md rounded-2xl flex flex-col shadow-2xl z-50 hidden transform transition-all duration-300 origin-bottom-right scale-95 opacity-0">
-    <div class="p-3 border-b border-white/10 flex justify-between items-center bg-white/5 rounded-t-2xl">
-        <h4 class="text-white font-bold text-sm flex items-center gap-2">
-            <i data-lucide="message-square" class="w-4 h-4 text-pink-400"></i> Game Chat
-        </h4>
-        <button onclick="toggleChat()" class="text-white/50 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
-    </div>
-    
-    <div id="chat-messages" class="flex-1 overflow-y-auto p-3 space-y-2 text-xs scrollbar-hide">
-        <div class="text-center text-white/30 italic">Start chatting...</div>
-    </div>
-
-    <div class="p-2 border-t border-white/10 flex gap-2">
-        <input type="text" id="chat-input" placeholder="Type here..." class="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-xs focus:outline-none focus:border-pink-500">
-        <button onclick="sendChatMessage()" class="bg-pink-600 p-2 rounded-lg text-white hover:bg-pink-700 transition">
-            <i data-lucide="send" class="w-4 h-4"></i>
-        </button>
-    </div>
-</div>
-
-<style>
-    /* Chat Scrollbar Hide */
-    .scrollbar-hide::-webkit-scrollbar { display: none; }
-    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-</style>
 
 <div id="premium-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center bg-black/90 backdrop-blur-md">
     <div class="bg-zinc-950 border-2 border-red-600/30 p-8 rounded-[2.5rem] w-[90%] max-w-md text-center shadow-[0_0_50px_rgba(220,38,38,0.2)]">
@@ -8659,151 +9428,426 @@ window.addEventListener('load', () => {
     </div>
 </div>
 
-<!-- ======================================================== -->
-<!-- 💬 IN-GAME FLOATING CHAT WIDGET (Multiplayer Only) -->
-<!-- ======================================================== -->
-
-<!-- Floating Chat Trigger Button (Corner mein floating icon) -->
-<button id="chat-toggle-btn" onclick="window.toggleFloatingChat()" class="hidden fixed bottom-6 right-6 z-[99999] w-14 h-14 rounded-full bg-gradient-to-br from-pink-600 to-rose-700 border-2 border-pink-400 text-white shadow-[0_0_20px_rgba(236,72,153,0.6)] flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
-    <i data-lucide="message-circle" class="w-7 h-7"></i>
-    <!-- Unread Notification Badge -->
-    <span id="chat-badge" class="hidden absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-black animate-pulse"></span>
+<!-- ═══════════════════════════════════════════════════════
+     E2E CHAT: Voice · Image · Text (PeerJS P2P)
+═══════════════════════════════════════════════════════ -->
+<button id="chat-toggle-btn" onclick="window.toggleFloatingChat()"
+    class="hidden fixed bottom-6 right-6 z-[99999] w-14 h-14 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+    style="background:linear-gradient(135deg,#c2556a,#9b3a50);box-shadow:0 0 24px rgba(194,85,106,0.55);border:2px solid rgba(194,85,106,0.5);">
+    <i data-lucide="message-circle-heart" class="w-7 h-7 text-white"></i>
+    <span id="chat-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-black text-[9px] font-bold text-white flex items-center justify-center animate-pulse" id="chat-badge">!</span>
 </button>
 
-<!-- Partner Active Status (Header ya Top pe dikhane ke liye) -->
-<div id="partner-status" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-[9999] bg-black/70 backdrop-blur-md px-4 py-1.5 rounded-full border border-pink-500/30 text-center pointer-events-none">
-    <p id="partner-status-text" class="text-[11px] font-bold text-pink-300 tracking-wide">Partner: Connected & Ready</p>
+<!-- Partner Status Pill -->
+<div id="partner-status" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none">
+    <div style="background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);border:1px solid rgba(194,85,106,0.3);border-radius:99px;padding:0.3rem 1rem;display:flex;align-items:center;gap:0.4rem;">
+        <span style="width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
+        <p id="partner-status-text" style="font-size:0.68rem;color:rgba(240,200,210,0.9);letter-spacing:0.06em;">Partner connected</p>
+    </div>
 </div>
 
-<!-- Floating Chat Modal Window -->
-<div id="floating-chat-modal" class="hidden fixed bottom-24 right-6 z-[99999] w-[90vw] max-w-[340px] h-[400px] glass-panel flex flex-col overflow-hidden shadow-2xl border-2 border-pink-500/50 bg-[#12030a]/95 backdrop-blur-xl rounded-2xl animate-fade-in-up">
-    
-    <!-- Chat Header -->
-    <div class="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-pink-900/50 to-purple-900/50 border-b border-white/10">
-        <div class="flex items-center gap-2">
-            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-            <h4 class="text-sm font-bold text-white fancy-font tracking-wider">Live Couple Chat 💬</h4>
+<!-- ═══════════════════════════════════════════════════════
+     FLOATING CHAT MODAL  —  E2E: Text · Voice · Image
+═══════════════════════════════════════════════════════ -->
+<div id="floating-chat-modal"
+    class="hidden fixed z-[99999]"
+    style="bottom:5.5rem;right:1.25rem;width:min(92vw,340px);height:480px;
+           background:rgba(10,8,18,0.97);backdrop-filter:blur(24px);
+           border:1px solid rgba(194,85,106,0.25);border-radius:1.25rem;
+           box-shadow:0 24px 64px rgba(0,0,0,0.7);
+           display:none;flex-direction:column;overflow:hidden;">
+
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                padding:0.75rem 1rem;
+                border-bottom:1px solid rgba(255,255,255,0.07);
+                background:rgba(194,85,106,0.08);">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;"></span>
+            <span style="font-size:0.8rem;font-weight:500;color:#f0eaf0;letter-spacing:0.04em;">Live Chat</span>
+            <span style="font-size:0.6rem;color:rgba(240,234,240,0.35);letter-spacing:0.08em;text-transform:uppercase;">• E2E Encrypted</span>
         </div>
-        <button onclick="window.toggleFloatingChat()" class="text-white/60 hover:text-white p-1 rounded-full hover:bg-white/10 transition-colors">
-            <i data-lucide="x" class="w-5 h-5"></i>
+        <button onclick="window.toggleFloatingChat()"
+            style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.05);
+                   border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <i data-lucide="x" style="width:14px;height:14px;color:rgba(240,234,240,0.5);"></i>
         </button>
     </div>
 
-    <!-- Chat Messages Scroll Area -->
-    <div id="chat-messages-container" class="flex-grow overflow-y-auto custom-scroll p-3 space-y-3 flex flex-col text-left">
-        <div class="text-center my-2">
-            <span class="text-[9px] uppercase tracking-widest bg-white/5 text-white/40 px-3 py-1 rounded-full border border-white/5">End-to-End Secure Connection 🔒</span>
+    <!-- Messages Area -->
+    <div id="chat-messages-container"
+        style="flex:1;overflow-y:auto;padding:0.75rem;display:flex;flex-direction:column;gap:0.6rem;scrollbar-width:none;">
+        <div style="text-align:center;margin:0.25rem 0;">
+            <span style="font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;
+                         color:rgba(240,234,240,0.25);background:rgba(255,255,255,0.03);
+                         border:1px solid rgba(255,255,255,0.05);border-radius:99px;padding:0.25rem 0.75rem;">
+                🔒 Direct peer-to-peer · nothing stored
+            </span>
         </div>
     </div>
 
-    <!-- Quick Emoji / Reaction Bar -->
-    <div class="flex gap-1.5 px-3 py-1.5 bg-black/40 border-t border-white/5 overflow-x-auto custom-scroll">
-        <button onclick="window.sendQuickEmoji('🔥')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">🔥</button>
-        <button onclick="window.sendQuickEmoji('😈')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">😈</button>
-        <button onclick="window.sendQuickEmoji('🥵')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">🥵</button>
-        <button onclick="window.sendQuickEmoji('🫦')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">🫦</button>
-        <button onclick="window.sendQuickEmoji('💋')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">💋</button>
-        <button onclick="window.sendQuickEmoji('👀')" class="text-xs px-2 py-1 bg-white/5 hover:bg-white/10 rounded-lg">👀</button>
+    <!-- Voice recording progress bar (hidden by default) -->
+    <div id="voice-rec-bar" style="display:none;padding:0.4rem 1rem;background:rgba(194,85,106,0.12);border-top:1px solid rgba(194,85,106,0.2);">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#f43f5e;animation:pulse 1s infinite;flex-shrink:0;"></span>
+            <span id="voice-rec-timer" style="font-size:0.7rem;color:#fda4af;font-variant-numeric:tabular-nums;min-width:2.5rem;">0:00</span>
+            <div style="flex:1;height:3px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;">
+                <div id="voice-rec-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#c2556a,#f43f5e);transition:width 0.1s;"></div>
+            </div>
+            <button onclick="window.stopVoiceRecording(true)"
+                style="font-size:0.65rem;color:#fda4af;background:rgba(244,63,94,0.15);border:1px solid rgba(244,63,94,0.3);border-radius:99px;padding:0.2rem 0.6rem;cursor:pointer;">
+                Send
+            </button>
+            <button onclick="window.stopVoiceRecording(false)"
+                style="font-size:0.65rem;color:rgba(240,234,240,0.4);background:transparent;border:none;cursor:pointer;">
+                Cancel
+            </button>
+        </div>
     </div>
 
-    <!-- Chat Input Form -->
-    <div class="p-3 bg-black/60 border-t border-white/10 flex gap-2">
-        <input type="text" id="chat-input-box" placeholder="Whisper something dirty..." class="flex-1 bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder-white/30 focus:border-pink-500 outline-none" onkeypress="window.handleChatKeyPress(event)">
-        <button onclick="window.sendChatMessage()" class="btn-gradient px-4 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-pink-600 to-rose-600 shadow-md">
-            <i data-lucide="send" class="w-4 h-4"></i>
+    <!-- Quick Emoji Bar -->
+    <div style="display:flex;gap:0.35rem;padding:0.4rem 0.75rem;border-top:1px solid rgba(255,255,255,0.05);overflow-x:auto;scrollbar-width:none;">
+        <button onclick="window.sendQuickEmoji('🔥')" class="emoji-pill">🔥</button>
+        <button onclick="window.sendQuickEmoji('😈')" class="emoji-pill">😈</button>
+        <button onclick="window.sendQuickEmoji('🥵')" class="emoji-pill">🥵</button>
+        <button onclick="window.sendQuickEmoji('🫦')" class="emoji-pill">🫦</button>
+        <button onclick="window.sendQuickEmoji('💋')" class="emoji-pill">💋</button>
+        <button onclick="window.sendQuickEmoji('👀')" class="emoji-pill">👀</button>
+        <button onclick="window.sendQuickEmoji('❤️')" class="emoji-pill">❤️</button>
+        <button onclick="window.sendQuickEmoji('🤫')" class="emoji-pill">🤫</button>
+    </div>
+
+    <!-- Input Row -->
+    <div style="display:flex;gap:0.4rem;padding:0.6rem 0.75rem;border-top:1px solid rgba(255,255,255,0.07);background:rgba(0,0,0,0.4);align-items:center;">
+
+        <!-- Image picker (hidden input) -->
+        <input type="file" id="chat-img-input" accept="image/*" style="display:none;" onchange="window.handleImagePick(event)">
+
+        <!-- Image btn -->
+        <button onclick="document.getElementById('chat-img-input').click()"
+            title="Send image (stays private, peer-to-peer only)"
+            style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.05);
+                   border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;
+                   justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.2s;"
+            onmouseover="this.style.background='rgba(194,85,106,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+            <i data-lucide="image" style="width:15px;height:15px;color:rgba(240,234,240,0.5);"></i>
+        </button>
+
+        <!-- Voice btn -->
+        <button id="voice-btn" onclick="window.toggleVoiceRecording()"
+            title="Hold to record voice note"
+            style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.05);
+                   border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;
+                   justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.2s;"
+            onmouseover="this.style.background='rgba(194,85,106,0.2)'" onmouseout="if(!window._isRecording)this.style.background='rgba(255,255,255,0.05)'">
+            <i data-lucide="mic" style="width:15px;height:15px;color:rgba(240,234,240,0.5);" id="voice-btn-icon"></i>
+        </button>
+
+        <!-- Text input -->
+        <input type="text" id="chat-input-box"
+            placeholder="Whisper something…"
+            onkeypress="window.handleChatKeyPress(event)"
+            style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+                   border-radius:0.6rem;padding:0.5rem 0.75rem;font-size:0.78rem;color:#f0eaf0;
+                   outline:none;transition:border-color 0.2s;"
+            onfocus="this.style.borderColor='rgba(194,85,106,0.5)'"
+            onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+
+        <!-- Send btn -->
+        <button onclick="window.sendChatMessage()"
+            style="width:34px;height:34px;border-radius:50%;flex-shrink:0;
+                   background:linear-gradient(135deg,#c2556a,#9b3a50);
+                   border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;
+                   transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 2px 10px rgba(194,85,106,0.4);"
+            onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+            <i data-lucide="send" style="width:14px;height:14px;color:#fff;"></i>
         </button>
     </div>
 </div>
+
+<style>
+.emoji-pill{font-size:0.9rem;padding:0.2rem 0.45rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:0.5rem;cursor:pointer;transition:background 0.15s;flex-shrink:0;}
+.emoji-pill:hover{background:rgba(194,85,106,0.2);}
+#chat-messages-container::-webkit-scrollbar{display:none;}
+.chat-bubble-me{background:linear-gradient(135deg,#c2556a,#9b3a50);color:#fff;border-radius:1rem 1rem 0.2rem 1rem;padding:0.5rem 0.75rem;font-size:0.78rem;line-height:1.5;max-width:80%;word-break:break-word;box-shadow:0 2px 10px rgba(194,85,106,0.3);}
+.chat-bubble-partner{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(240,234,240,0.9);border-radius:1rem 1rem 1rem 0.2rem;padding:0.5rem 0.75rem;font-size:0.78rem;line-height:1.5;max-width:80%;word-break:break-word;}
+.chat-msg-row-me{display:flex;flex-direction:column;align-items:flex-end;}
+.chat-msg-row-partner{display:flex;flex-direction:column;align-items:flex-start;}
+.chat-meta{font-size:0.6rem;color:rgba(240,234,240,0.3);margin-top:0.2rem;padding:0 0.25rem;}
+.chat-audio{width:100%;max-width:220px;height:32px;border-radius:99px;accent-color:#c2556a;outline:none;}
+.chat-img-thumb{max-width:200px;max-height:180px;border-radius:0.75rem;cursor:pointer;object-fit:cover;border:1px solid rgba(255,255,255,0.1);}
+.img-sending-spinner{font-size:0.7rem;color:rgba(240,234,240,0.4);padding:0.4rem 0.75rem;background:rgba(255,255,255,0.04);border-radius:0.75rem;}
+</style>
 
 <script>
-    // --- CHAT WIDGET JAVASCRIPT CONTROLLER ---
+// ═══════════════════════════════════════════════════════
+// INTIMATE SPARKS — E2E CHAT ENGINE
+// Text · Voice (MediaRecorder → base64 chunks) · Image
+// Pure PeerJS DataChannel — zero server storage
+// ═══════════════════════════════════════════════════════
 
-    // Toggle Chat Window Open/Close
-    window.toggleFloatingChat = () => {
-        const modal = document.getElementById('floating-chat-modal');
-        const badge = document.getElementById('chat-badge');
-        
-        if (modal.classList.contains('hidden')) {
-            modal.classList.remove('hidden');
-            badge.classList.add('hidden'); // Clear unread notification
-            document.getElementById('chat-input-box').focus();
-        } else {
-            modal.classList.add('hidden');
-        }
-        if (window.lucide) lucide.createIcons();
-    };
+(function() {
 
-    // Send Message Trigger
-    window.sendChatMessage = () => {
-        const input = document.getElementById('chat-input-box');
-        const text = input.value.trim();
-        if (!text) return;
+// ── helpers ──────────────────────────────────────────
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-        // Append my own message to UI
-        window.appendMessage(text, 'me');
-        input.value = '';
+function nowStr(){
+    const d=new Date();
+    return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+}
 
-        // Send via PeerJS Connection (Multiplayer data channel)
-        if (window.state && window.state.isMultiplayer && window.state.connection) {
-            try {
-                window.state.connection.send({
-                    type: 'CHAT_MSG',
-                    payload: { text: text }
-                });
-            } catch (e) {
-                console.error("Chat send error:", e);
-                window.showFeedback("Message failed to send. Check connection.", true);
-            }
-        } else {
-            window.showFeedback("You are not connected in Multiplayer mode!", true);
-        }
-    };
+function scrollBottom(){
+    const c=document.getElementById('chat-messages-container');
+    if(c) c.scrollTop=c.scrollHeight;
+}
 
-    // Quick Emoji Click Handler
-    window.sendQuickEmoji = (emoji) => {
-        const input = document.getElementById('chat-input-box');
-        input.value += emoji;
-        input.focus();
-    };
-
-    // Enter Key Handler
-    window.handleChatKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            window.sendChatMessage();
-        }
-    };
-
-    // Append Message to Container UI
-    window.appendMessage = (text, sender) => {
-        const container = document.getElementById('chat-messages-container');
-        const msgEl = document.createElement('div');
-        
-        const isMe = sender === 'me';
-        msgEl.className = `flex flex-col max-w-[80%] ${isMe ? 'self-end items-end' : 'self-start items-start'} animate-fade-in-up`;
-        
-        msgEl.innerHTML = `
-            <div class="px-3 py-2 rounded-2xl text-xs leading-relaxed ${isMe ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-br-none shadow-md' : 'bg-white/10 border border-white/10 text-white/90 rounded-bl-none'}">
-                ${escapeHtml(text)}
-            </div>
-            <span class="text-[8px] opacity-40 mt-0.5 px-1">${isMe ? 'You' : 'Partner'}</span>
-        `;
-        
-        container.appendChild(msgEl);
-        container.scrollTop = container.scrollHeight; // Auto-scroll to bottom
-
-        // If chat modal is closed, show unread badge notification
-        const modal = document.getElementById('floating-chat-modal');
-        if (!isMe && modal.classList.contains('hidden')) {
-            document.getElementById('chat-badge').classList.remove('hidden');
-        }
-    };
-
-    // XSS Safety helper
-    function escapeHtml(string) {
-        return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function notifyBadge(){
+    const modal=document.getElementById('floating-chat-modal');
+    if(modal && modal.style.display==='none'){
+        const b=document.getElementById('chat-badge');
+        if(b){ b.classList.remove('hidden'); b.style.display='flex'; }
     }
-</script>
+}
 
+// Chunk base64 into 12 KB pieces so PeerJS doesn't choke on large payloads
+const CHUNK_SIZE = 12000;
+
+function sendMediaP2P(base64, mimeType){
+    if(!window.state || !window.state.isMultiplayer || !window.state.connection){
+        window.showFeedback('Connect in multiplayer first!', true);
+        return;
+    }
+    const id = Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    const chunks = [];
+    for(let i=0;i<base64.length;i+=CHUNK_SIZE) chunks.push(base64.slice(i,i+CHUNK_SIZE));
+    chunks.forEach((chunk, idx)=>{
+        try{
+            window.state.connection.send({
+                type:'CHAT_MEDIA_CHUNK',
+                payload:{ id, mediaType:mimeType, data:chunk, index:idx, total:chunks.length }
+            });
+        }catch(e){ console.error('chunk send err',e); }
+    });
+}
+
+// ── toggle open/close ────────────────────────────────
+window.toggleFloatingChat = () => {
+    const modal = document.getElementById('floating-chat-modal');
+    const badge = document.getElementById('chat-badge');
+    const isOpen = modal.style.display === 'flex';
+    modal.style.display = isOpen ? 'none' : 'flex';
+    if(!isOpen){
+        badge.classList.add('hidden');
+        badge.style.display='none';
+        setTimeout(()=>{ document.getElementById('chat-input-box').focus(); },80);
+    }
+    if(window.lucide) lucide.createIcons();
+};
+
+// ── text message ─────────────────────────────────────
+window.sendChatMessage = () => {
+    const input = document.getElementById('chat-input-box');
+    const text = input.value.trim();
+    if(!text) return;
+    window.appendMessage(text,'me');
+    input.value='';
+    if(window.state && window.state.isMultiplayer && window.state.connection){
+        try{ window.state.connection.send({ type:'CHAT_MSG', payload:{ text } }); }
+        catch(e){ window.showFeedback('Send failed. Check connection.',true); }
+    } else {
+        window.showFeedback('Not connected in multiplayer!',true);
+    }
+};
+
+window.sendQuickEmoji = (emoji) => {
+    const inp=document.getElementById('chat-input-box');
+    inp.value+=emoji; inp.focus();
+};
+
+window.handleChatKeyPress = (e) => {
+    if(e.key==='Enter') window.sendChatMessage();
+};
+
+// ── text bubble renderer ─────────────────────────────
+window.appendMessage = (text, sender) => {
+    const container=document.getElementById('chat-messages-container');
+    const isMe = sender==='me';
+    const row=document.createElement('div');
+    row.className = isMe ? 'chat-msg-row-me' : 'chat-msg-row-partner';
+    row.innerHTML=`
+        <div class="${isMe?'chat-bubble-me':'chat-bubble-partner'}">${escapeHtml(text)}</div>
+        <span class="chat-meta">${isMe?'You':'Partner'} · ${nowStr()}</span>`;
+    container.appendChild(row);
+    scrollBottom();
+    if(!isMe) notifyBadge();
+};
+
+// ── media bubble renderer (voice + image) ────────────
+window.appendMediaMessage = (base64, mimeType, sender) => {
+    const container=document.getElementById('chat-messages-container');
+    const isMe = sender==='me';
+    const row=document.createElement('div');
+    row.className = isMe ? 'chat-msg-row-me' : 'chat-msg-row-partner';
+
+    let inner='';
+    const src=`data:${mimeType};base64,${base64}`;
+
+    if(mimeType.startsWith('audio/')){
+        inner=`
+        <div class="${isMe?'chat-bubble-me':'chat-bubble-partner'}" style="padding:0.4rem 0.6rem;">
+            <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">
+                <i data-lucide="mic" style="width:12px;height:12px;opacity:0.7;flex-shrink:0;"></i>
+                <span style="font-size:0.65rem;opacity:0.6;">Voice note</span>
+            </div>
+            <audio controls class="chat-audio" src="${src}"></audio>
+        </div>`;
+    } else if(mimeType.startsWith('image/')){
+        inner=`
+        <div class="${isMe?'chat-bubble-me':'chat-bubble-partner'}" style="padding:0.3rem;">
+            <img src="${src}" class="chat-img-thumb"
+                 onclick="window.openImgFullscreen(this.src)"
+                 alt="Photo">
+        </div>`;
+    }
+
+    row.innerHTML=inner+`<span class="chat-meta">${isMe?'You':'Partner'} · ${nowStr()}</span>`;
+    container.appendChild(row);
+    scrollBottom();
+    if(window.lucide) lucide.createIcons();
+    if(!isMe) notifyBadge();
+};
+
+// ── fullscreen image viewer ──────────────────────────
+window.openImgFullscreen = (src) => {
+    let overlay=document.getElementById('img-fs-overlay');
+    if(!overlay){
+        overlay=document.createElement('div');
+        overlay.id='img-fs-overlay';
+        overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+        overlay.onclick=()=>overlay.remove();
+        const img=document.createElement('img');
+        img.style.cssText='max-width:95vw;max-height:90vh;border-radius:0.75rem;object-fit:contain;';
+        overlay.appendChild(img);
+        document.body.appendChild(overlay);
+    }
+    overlay.querySelector('img').src=src;
+    overlay.style.display='flex';
+};
+
+// ── voice recording ──────────────────────────────────
+let _mediaRecorder=null, _audioChunks=[], _recInterval=null, _recSeconds=0;
+window._isRecording=false;
+
+window.toggleVoiceRecording = () => {
+    if(window._isRecording){ window.stopVoiceRecording(true); }
+    else { window.startVoiceRecording(); }
+};
+
+window.startVoiceRecording = async () => {
+    if(!window.state || !window.state.isMultiplayer || !window.state.connection){
+        window.showFeedback('Connect in multiplayer first!',true); return;
+    }
+    try{
+        const stream=await navigator.mediaDevices.getUserMedia({ audio:true });
+        _audioChunks=[];
+        _mediaRecorder=new MediaRecorder(stream);
+        _mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) _audioChunks.push(e.data); };
+        _mediaRecorder.onstop=()=>{ stream.getTracks().forEach(t=>t.stop()); };
+        _mediaRecorder.start(100);
+        window._isRecording=true;
+
+        // UI feedback
+        const btn=document.getElementById('voice-btn');
+        const icon=document.getElementById('voice-btn-icon');
+        btn.style.background='rgba(244,63,94,0.3)';
+        btn.style.borderColor='rgba(244,63,94,0.6)';
+        if(icon) icon.setAttribute('data-lucide','mic-off');
+        document.getElementById('voice-rec-bar').style.display='block';
+
+        _recSeconds=0;
+        _recInterval=setInterval(()=>{
+            _recSeconds++;
+            const m=Math.floor(_recSeconds/60), s=_recSeconds%60;
+            const timerEl=document.getElementById('voice-rec-timer');
+            const fillEl=document.getElementById('voice-rec-fill');
+            if(timerEl) timerEl.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+            if(fillEl) fillEl.style.width=Math.min((_recSeconds/120)*100,100)+'%';
+            if(_recSeconds>=120) window.stopVoiceRecording(true); // auto-stop at 2 min
+        },1000);
+
+        if(window.lucide) lucide.createIcons();
+    }catch(err){
+        window.showFeedback('Mic access denied.',true);
+        console.error(err);
+    }
+};
+
+window.stopVoiceRecording = (send) => {
+    if(!_mediaRecorder) return;
+    clearInterval(_recInterval);
+    _recInterval=null;
+    window._isRecording=false;
+
+    // Reset UI
+    const btn=document.getElementById('voice-btn');
+    const icon=document.getElementById('voice-btn-icon');
+    btn.style.background='rgba(255,255,255,0.05)';
+    btn.style.borderColor='rgba(255,255,255,0.1)';
+    if(icon) icon.setAttribute('data-lucide','mic');
+    document.getElementById('voice-rec-bar').style.display='none';
+    if(window.lucide) lucide.createIcons();
+
+    if(!send){ _mediaRecorder.stop(); _mediaRecorder=null; return; }
+
+    _mediaRecorder.onstop=async ()=>{
+        const blob=new Blob(_audioChunks, { type:'audio/webm' });
+        const mimeType='audio/webm';
+
+        // Show in own chat immediately
+        const reader=new FileReader();
+        reader.onload=()=>{
+            const b64=reader.result.split(',')[1];
+            window.appendMediaMessage(b64, mimeType,'me');
+            sendMediaP2P(b64, mimeType);
+        };
+        reader.readAsDataURL(blob);
+        _mediaRecorder=null;
+    };
+    _mediaRecorder.stop();
+};
+
+// ── image pick & send ────────────────────────────────
+window.handleImagePick = (event) => {
+    if(!window.state || !window.state.isMultiplayer || !window.state.connection){
+        window.showFeedback('Connect in multiplayer first!',true);
+        event.target.value=''; return;
+    }
+    const file=event.target.files[0];
+    if(!file) return;
+    if(file.size > 4*1024*1024){ window.showFeedback('Image too large. Max 4 MB.',true); event.target.value=''; return; }
+
+    // Show spinner
+    const container=document.getElementById('chat-messages-container');
+    const spinner=document.createElement('div');
+    spinner.className='chat-msg-row-me';
+    spinner.innerHTML=`<div class="img-sending-spinner">Sending image…</div>`;
+    container.appendChild(spinner);
+    scrollBottom();
+
+    const reader=new FileReader();
+    reader.onload=()=>{
+        const b64=reader.result.split(',')[1];
+        const mime=file.type||'image/jpeg';
+        container.removeChild(spinner);
+        window.appendMediaMessage(b64, mime,'me');
+        sendMediaP2P(b64, mime);
+    };
+    reader.readAsDataURL(file);
+    event.target.value='';
+};
+
+})(); // end IIFE
+</script>
 
 </body>
 </html>
